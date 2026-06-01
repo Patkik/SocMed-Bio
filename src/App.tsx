@@ -631,7 +631,7 @@ export default function App() {
                       className="focus:outline-none"
                     >
                       {revealColor ? (
-                        <span className="text-white font-bold text-xs">RED</span>
+                        <span className="text-white font-bold text-xs">SECRET</span>
                       ) : (
                         <GlitchText text="[REDACTED]" className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs cursor-pointer" />
                       )}
@@ -639,7 +639,7 @@ export default function App() {
                   </div>
 
                   <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
-                    <span className="text-matrix/70 text-xs">NASA COMMENT SECTION</span>
+                    <span className="text-matrix/70 text-xs">SECRET</span>
                     <button
                       onClick={() => {
                         if (audioEnabled) clickSound();
