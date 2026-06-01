@@ -5,7 +5,7 @@ import {
   Image as ImageIcon, Github, Instagram, Facebook,
   Linkedin, ExternalLink, Volume2, VolumeX,
   TerminalSquare, Info, Code, FileCode, Coffee,
-  Database, GitBranch, Cloud, Bot, Box
+  Database, GitBranch, Cloud, Bot, Box, Mail
 } from 'lucide-react';
 
 
@@ -616,6 +616,36 @@ export default function App() {
                 </motion.div>
               </div>
 
+              {/* SERVICES PROVISIONED CARD */}
+              <div className="cyber-card p-6 space-y-4 shadow-glow">
+                <div className="flex items-center gap-2 border-b border-matrix/30 pb-3">
+                  <Terminal size={18} className="text-matrix-light" />
+                  <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">SERVICES_PROVISIONED</h2>
+                </div>
+                <div className="space-y-4 font-mono">
+                  <div className="border border-matrix/20 bg-matrix-dark/10 p-3 rounded hover:border-matrix/50 transition-all">
+                    <span className="text-matrix-light font-bold text-xs tracking-wider block uppercase">// SERVICE_01 // ACTIVE</span>
+                    <span className="text-white text-sm font-bold">Full-stack Web Developer</span>
+                    <p className="text-[10px] text-matrix/70 mt-1">End-to-end web deployment, interactive modules, and high-performance server structures.</p>
+                  </div>
+                  <div className="border border-matrix/20 bg-matrix-dark/10 p-3 rounded hover:border-matrix/50 transition-all">
+                    <span className="text-matrix-light font-bold text-xs tracking-wider block uppercase">// SERVICE_02 // ACTIVE</span>
+                    <span className="text-white text-sm font-bold">Graphic Designer</span>
+                    <p className="text-[10px] text-matrix/70 mt-1">Sleek visual layouts, modern UI branding elements, and customized digital assets.</p>
+                  </div>
+                  <div className="pt-2">
+                    <a
+                      href="mailto:patrickjoshanedez35@gmail.com"
+                      onClick={() => { if (audioEnabled) clickSound(); }}
+                      className="inline-flex items-center gap-2 border border-matrix bg-matrix-dark/20 hover:bg-matrix/10 px-4 py-2 rounded text-xs text-matrix-light font-bold transition-all shadow-glow w-full justify-center"
+                    >
+                      <Mail size={14} className="animate-pulse text-matrix-light" />
+                      <span>CONTACT: patrickjoshanedez35@gmail.com</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
               {/* SPECIFICATION CARD WITH DECRYPTION LOCKS */}
               <div className="cyber-card p-6 space-y-4 shadow-glow">
                 <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-2 uppercase font-bold tracking-wider">SYSTEM_SPECS // REVEAL_LOCKS</div>
@@ -1057,6 +1087,7 @@ export default function App() {
 
             <div className="flex flex-wrap justify-center gap-4">
               {[
+                { name: 'Gmail', icon: <Mail size={16} />, url: 'mailto:patrickjoshanedez35@gmail.com' },
                 { name: 'Facebook', icon: <Facebook size={16} />, url: 'https://www.facebook.com/Patkik.juice/' },
                 { name: 'Instagram', icon: <Instagram size={16} />, url: 'https://www.instagram.com/patweck009/' },
                 { name: 'TikTok', icon: <span className="font-black text-[10px] tracking-tighter">TT</span>, url: 'https://tiktok.com/@takeshi_190' },
