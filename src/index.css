@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #050505;
+    color: #00ff41;
+    font-family: 'Share Tech Mono', 'Fira Code', monospace;
+    overflow-x: hidden;
+  }
+
+  /* Custom glowing scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #011502;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #00ff41;
+    border-radius: 3px;
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00ff66;
+  }
+}
+
+/* scanlines for retro CRT feel */
+.crt-scanlines::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9999;
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+}
+
+/* Digital Grid Background */
+.cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 255, 65, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 65, 0.04) 1px, transparent 1px);
+}
+
+/* Cyber glow helpers */
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.25);
+}
+
+.shadow-glow-intense {
+  box-shadow: 0 0 25px rgba(0, 255, 65, 0.55);
+}
+
+.shadow-glow-red {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+}
+
+/* Custom flicker */
+@keyframes crt-flicker {
+  0% { opacity: 0.985; }
+  50% { opacity: 0.995; }
+  100% { opacity: 0.985; }
+}
+
+.flicker-animation {
+  animation: crt-flicker 0.15s infinite;
+}
+
+/* Glowing text */
+.text-glow {
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.7);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+/* Tech card clip paths for futuristic corner brackets */
+.cyber-card {
+  position: relative;
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #00ff41;
+  border-left: 2px solid #00ff41;
+}
+
+.cyber-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #00ff41;
+  border-right: 2px solid #00ff41;
+}
+
+/* Glitch styling */
+.glitch-hover:hover {
+  text-shadow: 
+    -2px -2px 0px rgba(0, 255, 102, 0.7),
+    2px 2px 0px rgba(255, 0, 0, 0.4);
+}
+
+/* Hacker Glitch Text Effect */
+.animate-cyber-glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.animate-cyber-glitch::before,
+.animate-cyber-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050505; /* Matches background */
+}
+
+.animate-cyber-glitch::before {
+  left: 2px;
+  text-shadow: -1px 0 #ff003c;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.animate-cyber-glitch::after {
+  left: -2px;
+  text-shadow: -1px 0 #00ff41, 0 1px #00ffff;
+  clip: rect(85px, 450px, 140px, 0);
+  animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(31px, 9999px, 94px, 0); }
+  10% { clip: rect(112px, 9999px, 76px, 0); }
+  20% { clip: rect(85px, 9999px, 5px, 0); }
+  30% { clip: rect(27px, 9999px, 115px, 0); }
+  40% { clip: rect(73px, 9999px, 29px, 0); }
+  50% { clip: rect(118px, 9999px, 145px, 0); }
+  60% { clip: rect(18px, 9999px, 93px, 0); }
+  70% { clip: rect(43px, 9999px, 57px, 0); }
+  80% { clip: rect(116px, 9999px, 99px, 0); }
+  90% { clip: rect(109px, 9999px, 4px, 0); }
+  100% { clip: rect(67px, 9999px, 122px, 0); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip: rect(76px, 9999px, 116px, 0); }
+  11% { clip: rect(43px, 9999px, 6px, 0); }
+  22% { clip: rect(122px, 9999px, 57px, 0); }
+  33% { clip: rect(9px, 9999px, 113px, 0); }
+  44% { clip: rect(134px, 9999px, 19px, 0); }
+  55% { clip: rect(23px, 9999px, 140px, 0); }
+  66% { clip: rect(91px, 9999px, 4px, 0); }
+  77% { clip: rect(127px, 9999px, 63px, 0); }
+  88% { clip: rect(12px, 9999px, 88px, 0); }
+  100% { clip: rect(81px, 9999px, 132px, 0); }
+}
