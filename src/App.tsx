@@ -179,46 +179,9 @@ export default function App() {
   // Time ticker
   const [systemTime, setSystemTime] = useState('');
 
-  // Gaming tab and simulation states
+  // Gaming tab states
   const [gamingTab, setGamingTab] = useState<'mlbb' | 'codm' | 'genshin'>('mlbb');
-  const [simulationActive, setSimulationActive] = useState(false);
-  const [simulationProgress, setSimulationProgress] = useState(0);
-  const [simulationOutput, setSimulationOutput] = useState<string>('');
   const [selectedHeroInfo, setSelectedHeroInfo] = useState<string>('');
-
-  const runGamingSimulation = () => {
-    if (simulationActive) return;
-    setSimulationActive(true);
-    setSimulationProgress(0);
-    setSimulationOutput("LAUNCHING COMBAT ENGINE...");
-    if (audioEnabled) warningSound();
-
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 20;
-      setSimulationProgress(progress);
-      if (progress === 20) {
-        setSimulationOutput("TARGET AREA CHECKED // EVALUATING MOVEMENT...");
-        if (audioEnabled) clickSound();
-      } else if (progress === 40) {
-        setSimulationOutput("HERO LOAD: KAGURA_OVERDRIVE [MATCHES: 600+]");
-        if (audioEnabled) clickSound();
-      } else if (progress === 60) {
-        setSimulationOutput("SYNAPSE LINK STABLE // WEAPON: SEIMEI UMBRELLA");
-        if (audioEnabled) clickSound();
-      } else if (progress === 80) {
-        setSimulationOutput("PROBABILITY: 98.6% DOMINANCE DETECTED");
-        if (audioEnabled) clickSound();
-      } else if (progress === 100) {
-        clearInterval(interval);
-        setSimulationOutput("VICTORY FORECAST // APEX DOMINANCE CONFIRMED!");
-        if (audioEnabled) synthBeep();
-        setTimeout(() => {
-          setSimulationActive(false);
-        }, 3000);
-      }
-    }, 400);
-  };
 
   // Audio Synth Engine (Web Audio API)
   const audioCtxRef = useRef<AudioContext | null>(null);
