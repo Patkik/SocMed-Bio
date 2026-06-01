@@ -401,8 +401,8 @@ export default function App() {
           "BSIT STATUS  : ACTIVE OPERATOR",
           "NIGHT CYCLE  : ACTIVE ALWAYS",
           "MOOD MATRIX  : CHILL // BUT UNSTABLE",
-          "FAV_COLOR    : RED",
-          "BIRTHDAY     : DECEMBER 26"
+          "FAV_COLOR    : SECRET",
+          "BIRTHDAY     : SECRET"
         ];
         break;
       case 'skills':
@@ -639,7 +639,7 @@ export default function App() {
                   </div>
 
                   <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
-                    <span className="text-matrix/70 text-xs">BIRTHDAY:</span>
+                    <span className="text-matrix/70 text-xs">NASA COMMENT SECTION</span>
                     <button
                       onClick={() => {
                         if (audioEnabled) clickSound();
@@ -648,7 +648,7 @@ export default function App() {
                       className="focus:outline-none"
                     >
                       {revealBirthday ? (
-                        <span className="text-white font-bold text-xs">DECEMBER 26</span>
+                        <span className="text-white font-bold text-xs">NASA COMMENT SECTION</span>
                       ) : (
                         <GlitchText text="[REDACTED]" className="text-matrix-light bg-matrix-dark/30 px-1 border border-matrix/30 text-xs cursor-pointer" />
                       )}
