@@ -135,39 +135,61 @@ const TECH_DETAILS: Record<string, { systemRole: string; xp: string; projects: s
   }
 };
 
-// --- TERMINAL TYPEWRITER ENGINE ---
+// --- TERMINAL TYPEWRITER ENGINE WITH DYNAMIC SCRAMBLE GLITCH ---
 function Typewriter({ 
   text, 
-  speed = 12, 
-  onTick 
+  speed = 20, 
+  onTick,
+  onComplete
 }: { 
   text: string; 
   speed?: number; 
-  onTick?: () => void;
+  onTick?: (char: string) => void;
+  onComplete?: () => void;
 }) {
   const [displayedText, setDisplayedText] = useState("");
+  const glitchChars = ["%", "*", "$", "&", "?", "#", "@", "_", "1", "0", "░", "█", "▰", "▲", "§", "□", "■", "▚"];
 
   useEffect(() => {
     setDisplayedText("");
     let i = 0;
+    let frame = 0;
+    
+    const framesPerChar = Math.max(1, Math.floor(speed / 15));
+    
     const timer = setInterval(() => {
-      if (i < text.length) {
-        const char = text.charAt(i);
-        setDisplayedText((prev) => prev + char);
-        if (onTick && char !== ' ') {
-          onTick();
-        }
+      frame++;
+      if (frame >= framesPerChar) {
+        frame = 0;
         i++;
+      }
+
+      if (i <= text.length) {
+        let currentString = text.slice(0, i);
+        if (i < text.length) {
+          const remainingLength = Math.min(2, text.length - i);
+          for (let k = 0; k < remainingLength; k++) {
+            currentString += glitchChars[Math.floor(Math.random() * glitchChars.length)];
+          }
+        }
+        setDisplayedText(currentString);
+        
+        if (frame === 0 && i > 0 && i <= text.length) {
+          const char = text.charAt(i - 1);
+          if (onTick) onTick(char);
+        }
       } else {
         clearInterval(timer);
+        if (onComplete) onComplete();
       }
-    }, speed);
+    }, 15);
 
     return () => clearInterval(timer);
   }, [text, speed]);
 
   return <span>{displayedText}</span>;
 }
+
 
 // --- CYBER GLITCH INTERFACES & COMPONENTS ---
 interface GlitchProps {
@@ -320,6 +342,93 @@ export default function App() {
   const [expandedService, setExpandedService] = useState<number | null>(null);
   const [spotifyOpen, setSpotifyOpen] = useState(false);
 
+  // Robot Game Character face & glitching telemetry
+  const [typewriterCompleted, setTypewriterCompleted] = useState<Record<string, boolean>>({
+    role: false,
+    xp: false,
+    projects: false
+  });
+  const [isRobotGlitching, setIsRobotGlitching] = useState(false);
+  const [glitchFace, setGlitchFace] = useState("");
+  const [robotFace, setRobotFace] = useState("[ ◉ _ ◉ ]");
+
+  const allCompleted = typewriterCompleted.role && typewriterCompleted.xp && typewriterCompleted.projects;
+
+  // Face Expression controller
+  useEffect(() => {
+    if (!selectedTech) return;
+    
+    let timer: any;
+    let blinkTimer: any;
+    
+    if (isRobotGlitching) {
+      setRobotFace(glitchFace || "[ X _ X ]");
+      return;
+    }
+    
+    if (!allCompleted) {
+      // Dynamic talking animation cycle
+      const mouthFrames = ["[ ◉ ﹏ ◉ ]", "[ ⊙ ﹏ ⊙ ]", "[ ◉ ⌂ ◉ ]", "[ ☉ ﹏ ☉ ]"];
+      let frameIdx = 0;
+      
+      const cycleMouth = () => {
+        setRobotFace(mouthFrames[frameIdx]);
+        frameIdx = (frameIdx + 1) % mouthFrames.length;
+        timer = setTimeout(cycleMouth, 150);
+      };
+      cycleMouth();
+    } else {
+      // Satisfied/Happy status plus periodic blink triggers
+      setRobotFace("[ ◕ ‿ ◕ ]");
+      
+      const doBlink = () => {
+        setRobotFace("[ - _ - ]");
+        setTimeout(() => {
+          setRobotFace("[ ◕ ‿ ◕ ]");
+        }, 220);
+        
+        blinkTimer = setTimeout(doBlink, 3200 + Math.random() * 2000);
+      };
+      
+      blinkTimer = setTimeout(doBlink, 3000);
+    }
+    
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(blinkTimer);
+    };
+  }, [allCompleted, isRobotGlitching, glitchFace, selectedTech]);
+
+  // Periodic visual glitch trigger during writing sequences
+  useEffect(() => {
+    if (!selectedTech || allCompleted) {
+      setIsRobotGlitching(false);
+      return;
+    }
+    
+    let glitchTimer: any;
+    
+    const triggerGlitch = () => {
+      const errorFaces = ["[ E R R ]", "[ X _ X ]", "[ 0 1 0 1 ]", "[ @ _ @ ]", "[ ⚠ _ ⚠ ]", "[ ▞ _ ▞ ]"];
+      const randomFace = errorFaces[Math.floor(Math.random() * errorFaces.length)];
+      
+      setGlitchFace(randomFace);
+      setIsRobotGlitching(true);
+      playGlitchBuzz();
+      
+      setTimeout(() => {
+        setIsRobotGlitching(false);
+      }, 350);
+      
+      glitchTimer = setTimeout(triggerGlitch, 1800 + Math.random() * 1700);
+    };
+    
+    glitchTimer = setTimeout(triggerGlitch, 1500 + Math.random() * 1000);
+    
+    return () => clearTimeout(glitchTimer);
+  }, [selectedTech, allCompleted]);
+
+
   // Audio Synth Engine (Web Audio API)
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -425,9 +534,78 @@ export default function App() {
     } catch (e) {}
   };
 
-  const typeTick = () => {
-    playSound(1800 + Math.random() * 400, 'sine', 0.015, 0.01);
+  // Retro game dialogue vocal chatter + keyboard tick
+  const playVocalChirp = (char: string) => {
+    if (!audioEnabled || !audioCtxRef.current) return;
+    try {
+      if (audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const now = ctx.currentTime;
+      
+      // 1. High-frequency digital mechanical keypress tick
+      const oscTick = ctx.createOscillator();
+      const gainTick = ctx.createGain();
+      oscTick.type = 'sine';
+      oscTick.frequency.setValueAtTime(1800 + Math.random() * 400, now);
+      gainTick.gain.setValueAtTime(0.006, now);
+      gainTick.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+      oscTick.connect(gainTick);
+      gainTick.connect(ctx.destination);
+      oscTick.start();
+      oscTick.stop(now + 0.012);
+
+      // 2. Low-frequency robotic game voice beep/chirp
+      if (char !== ' ' && char !== '\n' && char !== '\r') {
+        const charCode = char.charCodeAt(0) || 100;
+        // Keep frequency in a nice, cute, low game character dialogue pitch (150Hz - 320Hz)
+        const baseFreq = 150 + (charCode % 12) * 12;
+        
+        const oscSpeech = ctx.createOscillator();
+        const gainSpeech = ctx.createGain();
+        oscSpeech.type = 'triangle';
+        oscSpeech.frequency.setValueAtTime(baseFreq, now);
+        // Sweeping effect for cartoon/cute game feel
+        oscSpeech.frequency.exponentialRampToValueAtTime(baseFreq * 0.82, now + 0.045);
+        
+        gainSpeech.gain.setValueAtTime(0.018, now);
+        gainSpeech.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+        
+        oscSpeech.connect(gainSpeech);
+        gainSpeech.connect(ctx.destination);
+        oscSpeech.start();
+        oscSpeech.stop(now + 0.045);
+      }
+    } catch (e) {}
   };
+
+  // Low mains hum digital aberration glitch sound
+  const playGlitchBuzz = () => {
+    if (!audioEnabled || !audioCtxRef.current) return;
+    try {
+      if (audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(65, now);
+      osc.frequency.linearRampToValueAtTime(175, now + 0.22);
+      
+      gain.gain.setValueAtTime(0.035, now);
+      gain.gain.linearRampToValueAtTime(0.0001, now + 0.22);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(now + 0.22);
+    } catch (e) {}
+  };
+
 
   const bootSequences = [
     "INITIATING COGNITIVE BOOT PROTOCOLS...",
@@ -1400,6 +1578,7 @@ export default function App() {
                             xp: "Integrated implementation within operational directives.",
                             projects: "Internal portfolio framework."
                           };
+                          setTypewriterCompleted({ role: false, xp: false, projects: false });
                           setSelectedTech({
                             name: stack.name,
                             category: stack.category,
@@ -1804,10 +1983,16 @@ export default function App() {
               }
             }}
             exit={{ y: 150, opacity: 0, scale: 0.95 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92vw] max-w-2xl z-50 bg-[#020202]/95 backdrop-blur-md border-2 border-matrix rounded-xl shadow-glow overflow-hidden select-none"
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 w-[92vw] max-w-2xl z-50 bg-[#020202]/95 backdrop-blur-md border-2 rounded-xl transition-all duration-75 select-none ${
+              isRobotGlitching 
+                ? "border-red-500 shadow-glow-red animate-chassis-shake animate-crt-aberration" 
+                : "border-matrix shadow-glow"
+            }`}
           >
             {/* Header / Hazard lines bar */}
-            <div className="flex items-center justify-between bg-matrix/10 border-b border-matrix/30 px-4 py-2 font-mono">
+            <div className={`flex items-center justify-between border-b px-4 py-2 font-mono transition-colors ${
+              isRobotGlitching ? "bg-red-950/20 border-red-500/30" : "bg-matrix/10 border-matrix/30"
+            }`}>
               <div className="flex items-center gap-2">
                 <motion.div 
                   animate={{ 
@@ -1815,12 +2000,17 @@ export default function App() {
                     rotate: [0, 5, -5, 0]
                   }}
                   transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="text-matrix font-bold tracking-tighter text-xs"
+                  className={`font-bold tracking-tighter text-xs ${isRobotGlitching ? "text-red-500" : "text-matrix"}`}
                 >
-                  🤖 [ ◉ _ ◉ ]
+                  🤖 {robotFace}
                 </motion.div>
-                <span className="text-[10px] text-matrix-light font-bold tracking-widest uppercase">
-                  SYS_ROBOT_INTELLIGENCE // INTERPRETING: {selectedTech.name.toUpperCase()}
+                <span className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${
+                  isRobotGlitching ? "text-red-400 animate-pulse text-glow-red" : "text-matrix-light"
+                }`}>
+                  {isRobotGlitching 
+                    ? "SYS_ROBOT_GLITCH // RE-INDEXING CORE TERMINAL DATA" 
+                    : `SYS_ROBOT_INTELLIGENCE // INTERPRETING: ${selectedTech.name.toUpperCase()}`
+                  }
                 </span>
               </div>
               <button
@@ -1828,54 +2018,96 @@ export default function App() {
                   playRobotShutdown();
                   setSelectedTech(null);
                 }}
-                className="text-matrix hover:text-white border border-matrix/30 hover:border-matrix bg-black px-1.5 py-0.5 rounded text-[9px] font-bold font-mono transition-all focus:outline-none"
+                className={`border bg-black px-1.5 py-0.5 rounded text-[9px] font-bold font-mono transition-all focus:outline-none ${
+                  isRobotGlitching 
+                    ? "text-red-500 border-red-500/30 hover:border-red-500 hover:text-white" 
+                    : "text-matrix hover:text-white border-matrix/30 hover:border-matrix"
+                }`}
               >
                 CLOSE [X]
               </button>
             </div>
 
             {/* Robot Content chassis */}
-            <div className="p-4 sm:p-6 space-y-4 font-mono text-xs text-matrix">
+            <div className={`p-4 sm:p-6 space-y-4 font-mono text-xs ${isRobotGlitching ? "text-red-400" : "text-matrix"}`}>
               
               {/* Dynamic Game Character Face */}
-              <div className="flex items-center gap-4 bg-matrix-dark/10 border border-matrix/20 p-3 rounded">
-                <div className="text-xl md:text-2xl font-bold bg-[#040404] px-3 py-1.5 rounded border border-matrix/10 text-matrix-light text-glow select-none tracking-widest animate-pulse">
-                  [ ◕ _ ◕ ]
+              <div className={`flex items-center gap-4 border p-3 rounded transition-colors ${
+                isRobotGlitching ? "bg-red-950/10 border-red-500/20" : "bg-matrix-dark/10 border-matrix/20"
+              }`}>
+                <div className={`text-xl md:text-2xl font-bold bg-[#040404] px-3 py-1.5 rounded border text-glow select-none tracking-widest ${
+                  isRobotGlitching 
+                    ? "border-red-500 text-red-500 text-glow-red animate-pulse" 
+                    : "border-matrix/10 text-matrix-light animate-pulse"
+                }`}>
+                  {robotFace}
                 </div>
-                <div className="text-[10px] text-matrix-light/80 leading-relaxed font-mono uppercase">
-                  "beep! Analyzing technical parameters. Telemetry indicates optimal compilation. Typewriter system active."
+                <div className={`text-[10px] leading-relaxed font-mono uppercase transition-colors ${
+                  isRobotGlitching ? "text-red-400 text-glow-red" : "text-matrix-light/80"
+                }`}>
+                  {isRobotGlitching 
+                    ? ">> [WARNING] TELEMETRY DATA UNSTABLE. COMPILING HARDWARE FAULTS [REDACTED]..." 
+                    : ">> [ONLINE] SYSTEM PARAMETERS LOADED. INITIATING HIGH-FIDELITY DECODING PROTOCOL..."
+                  }
                 </div>
               </div>
 
               {/* Data logs */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-matrix/20 pt-4">
+              <div className={`grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4 ${
+                isRobotGlitching ? "border-red-500/20" : "border-matrix/20"
+              }`}>
                 
-                <div className="sm:border-r border-matrix/15 pr-2">
-                  <span className="text-matrix-dark text-[9px] uppercase tracking-wider block font-bold mb-1">// COGNITIVE_ROLE</span>
-                  <p className="text-white text-[11px] font-sans leading-relaxed">
-                    <Typewriter text={selectedTech.systemRole} speed={12} onTick={typeTick} />
+                <div className={`sm:border-r pr-2 ${isRobotGlitching ? "border-red-500/10" : "border-matrix/15"}`}>
+                  <span className={`text-[9px] uppercase tracking-wider block font-bold mb-1 ${
+                    isRobotGlitching ? "text-red-500" : "text-matrix-dark"
+                  }`}>// COGNITIVE_ROLE</span>
+                  <p className="text-white text-[11px] font-sans leading-relaxed min-h-[40px]">
+                    <Typewriter 
+                      text={selectedTech.systemRole} 
+                      speed={20} 
+                      onTick={playVocalChirp} 
+                      onComplete={() => setTypewriterCompleted(prev => ({ ...prev, role: true }))} 
+                    />
                   </p>
                 </div>
                 
-                <div className="sm:border-r border-matrix/15 px-2">
-                  <span className="text-matrix-dark text-[9px] uppercase tracking-wider block font-bold mb-1">// OPERATOR_TRACK_RECORD</span>
-                  <p className="text-white text-[11px] font-sans leading-relaxed">
-                    <Typewriter text={selectedTech.xp} speed={12} onTick={typeTick} />
+                <div className={`sm:border-r px-2 ${isRobotGlitching ? "border-red-500/10" : "border-matrix/15"}`}>
+                  <span className={`text-[9px] uppercase tracking-wider block font-bold mb-1 ${
+                    isRobotGlitching ? "text-red-500" : "text-matrix-dark"
+                  }`}>// OPERATOR_TRACK_RECORD</span>
+                  <p className="text-white text-[11px] font-sans leading-relaxed min-h-[40px]">
+                    <Typewriter 
+                      text={selectedTech.xp} 
+                      speed={20} 
+                      onTick={playVocalChirp} 
+                      onComplete={() => setTypewriterCompleted(prev => ({ ...prev, xp: true }))} 
+                    />
                   </p>
                 </div>
                 
                 <div className="pl-2">
-                  <span className="text-matrix-dark text-[9px] uppercase tracking-wider block font-bold mb-1">// ASSOCIATED_PROJECTS</span>
-                  <p className="text-matrix-light text-[11px] font-sans font-bold leading-relaxed text-glow">
-                    <Typewriter text={selectedTech.projects} speed={12} onTick={typeTick} />
+                  <span className={`text-[9px] uppercase tracking-wider block font-bold mb-1 ${
+                    isRobotGlitching ? "text-red-500" : "text-matrix-dark"
+                  }`}>// ASSOCIATED_PROJECTS</span>
+                  <p className={`text-[11px] font-sans font-bold leading-relaxed min-h-[40px] ${
+                    isRobotGlitching ? "text-red-400 text-glow-red" : "text-matrix-light text-glow"
+                  }`}>
+                    <Typewriter 
+                      text={selectedTech.projects} 
+                      speed={20} 
+                      onTick={playVocalChirp} 
+                      onComplete={() => setTypewriterCompleted(prev => ({ ...prev, projects: true }))} 
+                    />
                   </p>
                 </div>
 
               </div>
               
-              <div className="text-[8px] text-matrix-dark flex justify-between border-t border-matrix-dark/20 pt-2 uppercase font-bold">
-                <span>TELEMETRY_LOG: STABLE</span>
-                <span>ROBOT_STATUS: ACTIVE // FEED_LOCK</span>
+              <div className={`text-[8px] flex justify-between border-t pt-2 uppercase font-bold transition-colors ${
+                isRobotGlitching ? "border-red-500/30 text-red-500" : "border-matrix-dark/20 text-matrix-dark"
+              }`}>
+                <span>{isRobotGlitching ? "TELEMETRY_LOG: CORRUPTED" : "TELEMETRY_LOG: STABLE"}</span>
+                <span>{isRobotGlitching ? "ROBOT_STATUS: MEM_FAULT_ERR" : "ROBOT_STATUS: ACTIVE // FEED_LOCK"}</span>
               </div>
             </div>
           </motion.div>
