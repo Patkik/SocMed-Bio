@@ -44,6 +44,131 @@ const TECH_STACKS = [
   { name: "Agentic A.I", category: "Next-Gen", level: 95 }
 ];
 
+const SERVICES_DATA = [
+  {
+    id: 1,
+    tag: "// SERVICE_01 // ACTIVE",
+    title: "Full-stack Web Developer",
+    shortDesc: "End-to-end web deployment, interactive modules, and high-performance server structures.",
+    projectName: "COMSOC_MIS_v1.0",
+    projectDesc: "A secure student organization management portal featuring live biometric dashboard logs, digital roster rosters, security firewall overlays, and high-fidelity custom design systems.",
+    projectLink: "https://github.com/Patkik/SocMed-Bio",
+    projectImage: "/img/art1.jpg" // Clean mockup link (easy to replace images here)
+  },
+  {
+    id: 2,
+    tag: "// SERVICE_02 // ACTIVE",
+    title: "Graphic Designer",
+    shortDesc: "Sleek visual layouts, modern UI branding elements, and customized digital assets.",
+    projectName: "CATERPRO_BRAND_DECK",
+    projectDesc: "A premium corporate identity design system. Crafted with strict Apple-inspired minimalist design rules, balanced typography ratios, and micro-interaction visual blueprints.",
+    projectLink: "https://github.com/Patkik/SocMed-Bio",
+    projectImage: "/img/art2.jpg" // Clean mockup link (easy to replace images here)
+  }
+];
+
+const TECH_DETAILS: Record<string, { systemRole: string; xp: string; projects: string }> = {
+  "html": {
+    systemRole: "Markup structural foundation layer.",
+    xp: "Crafting semantically complete Document Object Models with SEO compliance and ARIA access keys.",
+    projects: "Comsoc MIS, CaterPro Brand Landing Page."
+  },
+  "css": {
+    systemRole: "Visual layout styling engine.",
+    xp: "Designing modern fluid grid frameworks, CRT shaders, glassmorphism templates, and adaptive animation curves.",
+    projects: "Holy Portfolio, CaterPro Presentation Deck."
+  },
+  "javascript": {
+    systemRole: "Runtime behavioral engine.",
+    xp: "Asynchronous task orchestration, Web Audio API synthesis, dynamic canvas rendering, and live DOM updates.",
+    projects: "Spaceship Flight HUD, Comsoc member dashboard."
+  },
+  "typescript": {
+    systemRole: "Compile-time strict typing controller.",
+    xp: "Writing interface contracts, generics, strict null-safe checks, and compiler declarations to prevent system crashes.",
+    projects: "Holy Portfolio main build, SocMed-Bio telemetry data layer."
+  },
+  "react": {
+    systemRole: "Reactive state component virtual DOM engine.",
+    xp: "Framer Motion layout animations, component hooks (useState, useEffect, useRef), and lazy rendering optimizations.",
+    projects: "Hacker Dashboard Mainframe, Comsoc portal."
+  },
+  "java": {
+    systemRole: "Back-end business logic processing node.",
+    xp: "Object-oriented service development, relational mapping, secure REST endpoint controllers, and thread execution.",
+    projects: "CaterPro transaction service, Comsoc core audit server."
+  },
+  "mysql": {
+    systemRole: "Relational database structure engine.",
+    xp: "Designing normalized schemas, indexing keys, foreign key constraints, and writing high-speed query updates.",
+    projects: "Comsoc member roster data logs, CaterPro backend storage."
+  },
+  "mongodb": {
+    systemRole: "NoSQL document database catalog.",
+    xp: "BSON data schema designs, unstructured telemetry document logs, database clustering, and aggregate lookups.",
+    projects: "SocMed-Bio activity metrics, gaming API cache."
+  },
+  "redis": {
+    systemRole: "In-memory key-value caching system.",
+    xp: "Accelerating query speeds by caching API payloads, session tokens, and routing indexes under 5ms.",
+    projects: "Spaceship cockpit metrics, shell history session buffer."
+  },
+  "git": {
+    systemRole: "Distributed version control system.",
+    xp: "Branching protocols, pull requests, merge conflict resolutions, and CI/CD pipelines deployment integration.",
+    projects: "All projects managed under Github Patkik/SocMed-Bio repo."
+  },
+  "docker": {
+    systemRole: "Container virtualization infrastructure.",
+    xp: "Multi-stage Dockerfile configurations, alpine OS micro-images, and microservice containers networking configurations.",
+    projects: "Warped Portfolio Docker server deployments, AWS container runs."
+  },
+  "aws": {
+    systemRole: "Cloud computing compute cluster host.",
+    xp: "EC2 virtual servers provisioning, security group network configurations, SSH certificate validations, and public domain hosting.",
+    projects: "SocMed-Bio Live Server hosting, active portfolio EC2 nodes."
+  },
+  "agentic a.i": {
+    systemRole: "Next-Gen autonomous workspace assistant.",
+    xp: "Interpreting developer requirements, compiling software assets, deploying servers, and optimizing runtime parameters autonomously.",
+    projects: "Antigravity coding session, adaptive cockpit UI developer partner."
+  }
+};
+
+// --- TERMINAL TYPEWRITER ENGINE ---
+function Typewriter({ 
+  text, 
+  speed = 12, 
+  onTick 
+}: { 
+  text: string; 
+  speed?: number; 
+  onTick?: () => void;
+}) {
+  const [displayedText, setDisplayedText] = useState("");
+
+  useEffect(() => {
+    setDisplayedText("");
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        const char = text.charAt(i);
+        setDisplayedText((prev) => prev + char);
+        if (onTick && char !== ' ') {
+          onTick();
+        }
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return <span>{displayedText}</span>;
+}
+
 // --- CYBER GLITCH INTERFACES & COMPONENTS ---
 interface GlitchProps {
   text: string;
@@ -190,6 +315,11 @@ export default function App() {
   const [gamingTab, setGamingTab] = useState<'mlbb' | 'codm' | 'genshin'>('mlbb');
   const [selectedHeroInfo, setSelectedHeroInfo] = useState<string>('');
 
+  // Custom states for Robot, Accordion & Spotify
+  const [selectedTech, setSelectedTech] = useState<any | null>(null);
+  const [expandedService, setExpandedService] = useState<number | null>(null);
+  const [spotifyOpen, setSpotifyOpen] = useState(false);
+
   // Audio Synth Engine (Web Audio API)
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -245,6 +375,59 @@ export default function App() {
   const clickSound = () => playSound(800, 'square', 0.08, 0.02);
   const synthBeep = () => playSound(1200, 'sine', 0.15, 0.04);
   const warningSound = () => playSound(150, 'sawtooth', 0.25, 0.08);
+
+  const playRobotStartup = () => {
+    if (!audioEnabled || !audioCtxRef.current) return;
+    try {
+      initAudio();
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+      
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.setValueAtTime(800, now + 0.05);
+      osc.frequency.setValueAtTime(1600, now + 0.1);
+      
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(now + 0.25);
+    } catch (e) {}
+  };
+
+  const playRobotShutdown = () => {
+    if (!audioEnabled || !audioCtxRef.current) return;
+    try {
+      initAudio();
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+      
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.15);
+      
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(now + 0.2);
+    } catch (e) {}
+  };
+
+  const typeTick = () => {
+    playSound(1800 + Math.random() * 400, 'sine', 0.015, 0.01);
+  };
 
   const bootSequences = [
     "INITIATING COGNITIVE BOOT PROTOCOLS...",
@@ -1014,12 +1197,12 @@ export default function App() {
             </div>
           </header>
 
-          {/* MAIN GRID BODY: SPEC SIDEBAR + PORTFOLIO SECTIONS */}
+          {/* MAIN GRID BODY: RESPONSIVE 3-COLUMN TELEMETRY HUB */}
           <main className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-            {/* LEFT PROFILE & SPEC SIDEBAR */}
-            <div className="space-y-8 lg:sticky lg:top-8">
-
+            {/* COLUMN 1: BIO & SERVICES (STAYS AT THE TOP ON MOBILE) */}
+            <div className="space-y-8">
+              
               {/* SYSTEM OVERVIEW */}
               <div className="cyber-card p-6 space-y-6 shadow-glow">
                 <div className="flex items-center gap-2 border-b border-matrix/30 pb-3">
@@ -1061,17 +1244,94 @@ export default function App() {
                   <Terminal size={18} className="text-matrix-light" />
                   <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">SERVICES_PROVISIONED</h2>
                 </div>
-                <div className="space-y-4 font-mono">
-                  <div className="border border-matrix/20 bg-matrix-dark/10 p-3 rounded hover:border-matrix/50 transition-all">
-                    <span className="text-matrix-light font-bold text-xs tracking-wider block uppercase">// SERVICE_01 // ACTIVE</span>
-                    <span className="text-white text-sm font-bold">Full-stack Web Developer</span>
-                    <p className="text-[10px] text-matrix/70 mt-1">End-to-end web deployment, interactive modules, and high-performance server structures.</p>
-                  </div>
-                  <div className="border border-matrix/20 bg-matrix-dark/10 p-3 rounded hover:border-matrix/50 transition-all">
-                    <span className="text-matrix-light font-bold text-xs tracking-wider block uppercase">// SERVICE_02 // ACTIVE</span>
-                    <span className="text-white text-sm font-bold">Graphic Designer</span>
-                    <p className="text-[10px] text-matrix/70 mt-1">Sleek visual layouts, modern UI branding elements, and customized digital assets.</p>
-                  </div>
+                <div className="space-y-3 font-mono">
+                  {SERVICES_DATA.map((service) => {
+                    const isExpanded = expandedService === service.id;
+                    return (
+                      <div 
+                        key={service.id}
+                        className="border border-matrix/20 bg-matrix-dark/5 rounded overflow-hidden transition-all duration-300"
+                      >
+                        {/* Header accordion trigger */}
+                        <button
+                          onClick={() => {
+                            if (audioEnabled) clickSound();
+                            setExpandedService(isExpanded ? null : service.id);
+                          }}
+                          className="w-full flex flex-col items-start p-3 hover:bg-matrix-dark/10 text-left transition-colors focus:outline-none"
+                        >
+                          <div className="flex justify-between w-full items-center">
+                            <span className="text-matrix-dark text-[9px] uppercase tracking-wider font-bold">
+                              {service.tag}
+                            </span>
+                            <span className="text-matrix text-xs">
+                              {isExpanded ? "[-]" : "[+]"}
+                            </span>
+                          </div>
+                          <span className="text-white font-bold text-xs mt-1">
+                            {service.title}
+                          </span>
+                          <p className="text-[10px] text-matrix/60 mt-1">
+                            {service.shortDesc}
+                          </p>
+                        </button>
+
+                        {/* Collapsible apple-styled cinematic layout */}
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.35, ease: "easeInOut" }}
+                              className="border-t border-matrix/10 bg-black/40 px-3 pb-3 overflow-hidden"
+                            >
+                              {/* 
+                                ================================================================
+                                CINEMATIC ADVERTISEMENT DISPLAY (APPLE-LIKE PRODUCT PREVIEW)
+                                ----------------------------------------------------------------
+                                REPLACE_IMAGE_GUIDE:
+                                To replace the project placeholder image with your own,
+                                simply swap the 'src' path below in the <img> tag.
+                                ================================================================
+                              */}
+                              <div className="mt-3 border border-matrix/25 rounded-md bg-black/80 overflow-hidden relative group hover:border-matrix/40 transition-all shadow-glow">
+                                <div className="h-40 bg-gradient-to-br from-matrix-dark/20 to-black overflow-hidden relative flex items-center justify-center">
+                                  <img 
+                                    src={service.projectImage} 
+                                    alt={service.projectName} 
+                                    className="w-full h-full object-cover opacity-40 group-hover:opacity-75 group-hover:scale-105 transition-transform duration-700 filter grayscale group-hover:grayscale-0" 
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                                  <div className="absolute bottom-3 left-3 right-3">
+                                    <span className="text-[8px] uppercase tracking-widest text-matrix bg-matrix-dark/50 px-1.5 py-0.5 rounded border border-matrix/20 mb-1 inline-block">
+                                      // KEY_DEPLOYMENT
+                                    </span>
+                                    <h4 className="text-white font-black text-xs tracking-wider uppercase">{service.projectName}</h4>
+                                  </div>
+                                </div>
+                                <div className="p-3 space-y-3 font-mono">
+                                  <p className="text-[9px] text-matrix-light/80 leading-relaxed font-sans">
+                                    {service.projectDesc}
+                                  </p>
+                                  <a 
+                                    href={service.projectLink} 
+                                    target="_blank" 
+                                    rel="noreferrer" 
+                                    className="inline-flex items-center justify-center gap-1.5 border border-matrix bg-matrix-dark/20 hover:bg-matrix hover:text-black py-1 px-3 rounded text-[9px] font-black tracking-wider uppercase transition-all shadow-glow w-full text-center"
+                                  >
+                                    <span>DEPLOYED_MAIN_PORTAL</span>
+                                    <ExternalLink size={8} />
+                                  </a>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                  
                   <div className="pt-2">
                     <a
                       href="mailto:patrickjoshanedez35@gmail.com"
@@ -1085,61 +1345,213 @@ export default function App() {
                 </div>
               </div>
 
-              {/* SPECIFICATION CARD WITH DECRYPTION LOCKS */}
-              <div className="cyber-card p-6 space-y-4 shadow-glow">
-                <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-2 uppercase font-bold tracking-wider">SYSTEM_SPECS // REVEAL_LOCKS</div>
+            </div>
 
-                <div className="space-y-3">
-                  <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
-                    <span className="text-matrix/70 text-xs">FAV_COLOR:</span>
-                    <button
-                      onClick={() => {
-                        if (audioEnabled) clickSound();
-                        setRevealColor(!revealColor);
-                      }}
-                      className="focus:outline-none"
-                    >
-                      {revealColor ? (
-                        <span className="text-white font-bold text-xs">SECRET</span>
-                      ) : (
-                        <GlitchText text="[REDACTED]" className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs cursor-pointer" />
-                      )}
-                    </button>
+            {/* COLUMN 2: TECH INFRASTRUCTURE & SYSTEM SHELL (MIDDLE COLUMN) */}
+            <div className="space-y-8">
+
+              {/* ANIMATED TECH STACKS SECTION */}
+              <section className="cyber-card p-6 space-y-6 shadow-glow">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-matrix/30 pb-4 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Cpu size={20} className="text-matrix-light animate-spin" style={{ animationDuration: '6s' }} />
+                    <h2 className="text-lg font-bold tracking-widest text-matrix-light uppercase">TECH_INFRASTRUCTURE</h2>
                   </div>
 
-                  <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
-                    <span className="text-matrix/70 text-xs">SECRET</span>
-                    <button
-                      onClick={() => {
-                        if (audioEnabled) clickSound();
-                        setRevealBirthday(!revealBirthday);
-                      }}
-                      className="focus:outline-none"
-                    >
-                      {revealBirthday ? (
-                        <span className="text-white font-bold text-xs">NASA COMMENT SECTION</span>
-                      ) : (
-                        <GlitchText text="[REDACTED]" className="text-matrix-light bg-matrix-dark/30 px-1 border border-matrix/30 text-xs cursor-pointer" />
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="text-xs flex justify-between py-1">
-                    <span className="text-matrix/70">GEOLOCATION:</span>
-                    <span className="text-white">FROM_PLANET_MARS</span>
-                  </div>
-
-                  <div className="text-xs flex justify-between py-1">
-                    <span className="text-matrix/70">MOOD:</span>
-                    <span className="text-matrix-light text-glow">CHILL_STATE</span>
-                  </div>
-
-                  <div className="text-xs flex justify-between py-1">
-                    <span className="text-matrix/70">ENERGY_SRC:</span>
-                    <span className="text-matrix-light text-glow">COFFEE_AND_PROBABLY_SLEEPING</span>
+                  {/* Category Filter Chips */}
+                  <div className="flex flex-wrap gap-2">
+                    {['All', 'Frontend', 'Backend', 'Database', 'Version Control', 'DevOps', 'Next-Gen'].map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          if (audioEnabled) clickSound();
+                          setSelectedCategory(cat);
+                        }}
+                        className={`px-2 py-1 text-[10px] border rounded transition-all font-bold ${selectedCategory === cat
+                          ? 'border-matrix bg-matrix/20 text-matrix-light text-glow'
+                          : 'border-matrix/20 text-matrix/50 hover:border-matrix/40 hover:text-matrix'
+                          }`}
+                      >
+                        {cat.toUpperCase()}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <AnimatePresence mode="popLayout">
+                    {filteredSkills.map((stack, idx) => (
+                      <motion.div
+                        layout
+                        key={stack.name}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        whileHover={{
+                          y: -4,
+                          borderColor: '#00ff66',
+                          boxShadow: "0px 0px 15px rgba(0,255,65,0.3)"
+                        }}
+                        onClick={() => {
+                          if (audioEnabled) clickSound();
+                          const key = stack.name.toLowerCase();
+                          const details = TECH_DETAILS[key] || {
+                            systemRole: "Core structural development stack.",
+                            xp: "Integrated implementation within operational directives.",
+                            projects: "Internal portfolio framework."
+                          };
+                          setSelectedTech({
+                            name: stack.name,
+                            category: stack.category,
+                            ...details
+                          });
+                          playRobotStartup();
+                        }}
+                        className="bg-black/80 border border-matrix/30 p-4 rounded relative overflow-hidden group cursor-pointer"
+                      >
+                        <div className="absolute top-0 right-0 p-1 text-[8px] bg-matrix-dark/30 border-l border-b border-matrix/20 text-matrix/50 group-hover:text-matrix-light">
+                          {stack.category}
+                        </div>
+                        <div className="flex items-center gap-3 mb-2">
+                          {getTechIcon(stack.name)}
+                          <h4 className="text-sm font-bold text-white group-hover:text-matrix-light transition-colors">
+                            {stack.name}
+                          </h4>
+                        </div>
+                        {/* Static visual gauge bar */}
+                        <div className="w-full bg-matrix-dark/30 h-1.5 rounded overflow-hidden border border-matrix/10">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${stack.level}%` }}
+                            transition={{ duration: 1, delay: idx * 0.05 }}
+                            className="bg-matrix h-full shadow-glow"
+                          />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </section>
+
+              {/* INTERACTIVE CLI PANEL DRAWER */}
+              <section className="cyber-card shadow-glow overflow-hidden">
+                <button
+                  onClick={() => {
+                    if (audioEnabled) clickSound();
+                    setCliOpen(!cliOpen);
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-matrix-dark/10 hover:bg-matrix-dark/20 text-xs font-bold font-mono tracking-widest text-matrix-light border-b border-matrix/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <TerminalSquare size={16} className={cliOpen ? "animate-pulse" : ""} />
+                    <span>INTERACTIVE_SYSTEM_SHELL</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 border border-matrix/30 rounded bg-black">
+                    {cliOpen ? "COLLAPSE_TERM" : "OPEN_TERM"}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {cliOpen && (
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: "auto" }}
+                      exit={{ height: 0 }}
+                      className="bg-black/95 p-4 space-y-4"
+                    >
+                      <div className="h-44 overflow-y-auto font-mono text-xs text-matrix/90 space-y-1 bg-[#020202] p-3 border border-matrix-dark/40 rounded scrollbar-thin">
+                        {cliHistory.map((line, idx) => (
+                          <p key={idx} className="whitespace-pre-wrap">{line}</p>
+                        ))}
+                        <div className="flex items-center text-matrix-light mt-1">
+                          <span className="mr-2 text-matrix-dark font-bold font-mono">&gt;</span>
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              executeCommand(cliInput);
+                            }}
+                            className="flex-grow flex items-center"
+                          >
+                            <input
+                              type="text"
+                              value={cliInput}
+                              onChange={(e) => setCliInput(e.target.value)}
+                              className="bg-transparent border-none outline-none text-matrix-light flex-grow font-mono focus:ring-0 focus:border-none p-0 text-xs"
+                              placeholder="Type 'help' and press Enter..."
+                              autoFocus
+                            />
+                          </form>
+                        </div>
+                      </div>
+                      <div className="text-[9px] text-matrix-dark flex justify-between font-mono">
+                        <span>SECURITY_CLEARANCE: OPERATOR</span>
+                        <span>SHELL_VERSION: v2.0.4</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </section>
+
+            </div>
+
+            {/* COLUMN 3: BLUEPRINTS, GAMING & SPEC LOCKS (RIGHT COLUMN) */}
+            <div className="space-y-8">
+
+              {/* CLASSIFIED ARTWORK VAULT */}
+              <section className="cyber-card p-6 space-y-6 shadow-glow">
+                <div className="flex items-center gap-2 border-b border-matrix/30 pb-4">
+                  <ImageIcon size={20} className="text-matrix-light" />
+                  <h2 className="text-lg font-bold tracking-widest text-matrix-light uppercase">CREATIVE_VAULT // BLUEPRINTS</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {ARTWORKS_DATA.map((art) => (
+                    <div
+                      key={art.id}
+                      className="bg-black/90 border border-matrix/20 rounded overflow-hidden group hover:border-matrix/75 transition-all shadow-glow flex flex-col"
+                    >
+                      <div className="h-44 overflow-hidden bg-matrix-dark/20 relative">
+                        <img
+                          src={art.imageUrl}
+                          alt={art.title}
+                          className="w-full h-full object-cover opacity-50 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500 filter grayscale group-hover:grayscale-0"
+                        />
+                        <div className="absolute top-2 right-2 bg-black/85 px-2 py-0.5 border border-matrix/30 text-[9px] rounded text-white font-mono">
+                          ID: 00{art.id}
+                        </div>
+                        <div className="absolute bottom-2 left-2 bg-black/85 px-2 py-0.5 border border-matrix/20 text-[8px] text-matrix-light rounded font-mono">
+                          {art.hash}
+                        </div>
+                      </div>
+                      <div className="p-4 border-t border-matrix/20 bg-[#070707] flex-grow flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-sm font-bold text-white group-hover:text-matrix-light transition-colors mb-1 uppercase tracking-wider">{art.title}</h3>
+                          <p className="text-[11px] text-matrix/70 leading-relaxed font-mono mb-4">{art.description}</p>
+                        </div>
+                        <div className="text-[9px] text-matrix-dark border-t border-matrix-dark/20 pt-2 flex justify-between font-mono">
+                          <span>VAULT_DATE: {art.date}</span>
+                          <span>SYS_SECURE: PASS</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* MODULAR EXPANSION MANUAL */}
+                <div className="bg-matrix-dark/10 border border-matrix/30 p-4 rounded text-xs space-y-2">
+                  <div className="flex items-center gap-1.5 text-matrix-light font-bold uppercase text-[10px]">
+                    <Info size={14} className="text-matrix" /> MORE_ABOUT_ME:
+                  </div>
+                  <p className="text-[11px] text-matrix-light/80 leading-relaxed">
+                    I'm actually from another planet, so beware hooman.
+                  </p>
+                  <ol className="list-decimal pl-4 space-y-1 text-[11px] text-matrix/75">
+                    <li>totally not <code className="text-white">human</code>.</li>
+                    <li>do you want to build a <code className="text-white">snowman</code>?</li>
+                    <li>I can adapt easily to new environments just like planet Earth.</li>
+                  </ol>
+                </div>
+              </section>
 
               {/* GAMING INTELLIGENCE DECK */}
               <div className="cyber-card p-6 space-y-6 shadow-glow">
@@ -1278,246 +1690,66 @@ export default function App() {
                 </div>
               </div>
 
-            </div>
+              {/* SPECIFICATION CARD WITH DECRYPTION LOCKS */}
+              <div className="cyber-card p-6 space-y-4 shadow-glow">
+                <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-2 uppercase font-bold tracking-wider">SYSTEM_SPECS // REVEAL_LOCKS</div>
 
-            {/* RIGHT PORTFOLIO HUB */}
-            <div className="lg:col-span-2 space-y-12">
-
-              {/* ANIMATED TECH STACKS SECTION */}
-              <section className="cyber-card p-6 space-y-6 shadow-glow">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-matrix/30 pb-4 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Cpu size={20} className="text-matrix-light animate-spin" style={{ animationDuration: '6s' }} />
-                    <h2 className="text-lg font-bold tracking-widest text-matrix-light uppercase">TECH_INFRASTRUCTURE</h2>
-                  </div>
-
-                  {/* Category Filter Chips */}
-                  <div className="flex flex-wrap gap-2">
-                    {['All', 'Frontend', 'Backend', 'Database', 'Version Control', 'DevOps', 'Next-Gen'].map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => {
-                          if (audioEnabled) clickSound();
-                          setSelectedCategory(cat);
-                        }}
-                        className={`px-2 py-1 text-[10px] border rounded transition-all font-bold ${selectedCategory === cat
-                          ? 'border-matrix bg-matrix/20 text-matrix-light text-glow'
-                          : 'border-matrix/20 text-matrix/50 hover:border-matrix/40 hover:text-matrix'
-                          }`}
-                      >
-                        {cat.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  <AnimatePresence mode="popLayout">
-                    {filteredSkills.map((stack, idx) => (
-                      <motion.div
-                        layout
-                        key={stack.name}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        whileHover={{
-                          y: -4,
-                          borderColor: '#00ff66',
-                          boxShadow: "0px 0px 15px rgba(0,255,65,0.3)"
-                        }}
-                        className="bg-black/80 border border-matrix/30 p-4 rounded relative overflow-hidden group cursor-pointer"
-                      >
-                        <div className="absolute top-0 right-0 p-1 text-[8px] bg-matrix-dark/30 border-l border-b border-matrix/20 text-matrix/50 group-hover:text-matrix-light">
-                          {stack.category}
-                        </div>
-                        <div className="flex items-center gap-3 mb-2">
-                          {getTechIcon(stack.name)}
-                          <h4 className="text-sm font-bold text-white group-hover:text-matrix-light transition-colors">
-                            {stack.name}
-                          </h4>
-                        </div>
-                        {/* Static visual gauge bar */}
-                        <div className="w-full bg-matrix-dark/30 h-1.5 rounded overflow-hidden border border-matrix/10">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${stack.level}%` }}
-                            transition={{ duration: 1, delay: idx * 0.05 }}
-                            className="bg-matrix h-full shadow-glow"
-                          />
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </section>
-
-              {/* CLASSIFIED ARTWORK VAULT */}
-              <section className="cyber-card p-6 space-y-6 shadow-glow">
-                <div className="flex items-center gap-2 border-b border-matrix/30 pb-4">
-                  <ImageIcon size={20} className="text-matrix-light" />
-                  <h2 className="text-lg font-bold tracking-widest text-matrix-light uppercase">CREATIVE_VAULT // BLUEPRINTS</h2>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {ARTWORKS_DATA.map((art) => (
-                    <div
-                      key={art.id}
-                      className="bg-black/90 border border-matrix/20 rounded overflow-hidden group hover:border-matrix/75 transition-all shadow-glow flex flex-col"
+                <div className="space-y-3">
+                  <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
+                    <span className="text-matrix/70 text-xs">FAV_COLOR:</span>
+                    <button
+                      onClick={() => {
+                        if (audioEnabled) clickSound();
+                        setRevealColor(!revealColor);
+                      }}
+                      className="focus:outline-none"
                     >
-                      <div className="h-44 overflow-hidden bg-matrix-dark/20 relative">
-                        <img
-                          src={art.imageUrl}
-                          alt={art.title}
-                          className="w-full h-full object-cover opacity-50 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500 filter grayscale group-hover:grayscale-0"
-                        />
-                        <div className="absolute top-2 right-2 bg-black/85 px-2 py-0.5 border border-matrix/30 text-[9px] rounded text-white font-mono">
-                          ID: 00{art.id}
-                        </div>
-                        <div className="absolute bottom-2 left-2 bg-black/85 px-2 py-0.5 border border-matrix/20 text-[8px] text-matrix-light rounded font-mono">
-                          {art.hash}
-                        </div>
-                      </div>
-                      <div className="p-4 border-t border-matrix/20 bg-[#070707] flex-grow flex flex-col justify-between">
-                        <div>
-                          <h3 className="text-sm font-bold text-white group-hover:text-matrix-light transition-colors mb-1 uppercase tracking-wider">{art.title}</h3>
-                          <p className="text-[11px] text-matrix/70 leading-relaxed font-mono mb-4">{art.description}</p>
-                        </div>
-                        <div className="text-[9px] text-matrix-dark border-t border-matrix-dark/20 pt-2 flex justify-between font-mono">
-                          <span>VAULT_DATE: {art.date}</span>
-                          <span>SYS_SECURE: PASS</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* MODULAR EXPANSION MANUAL */}
-                <div className="bg-matrix-dark/10 border border-matrix/30 p-4 rounded text-xs space-y-2">
-                  <div className="flex items-center gap-1.5 text-matrix-light font-bold uppercase text-[10px]">
-                    <Info size={14} className="text-matrix" /> MORE_ABOUT_ME:
-                  </div>
-                  <p className="text-[11px] text-matrix-light/80 leading-relaxed">
-                    I'm actually from another planet, so beware hooman.
-                  </p>
-                  <ol className="list-decimal pl-4 space-y-1 text-[11px] text-matrix/75">
-                    <li>totally not <code className="text-white">human</code>.</li>
-                    <li>do you want to build a <code className="text-white">snowman</code>?</li>
-                    <li>I can adapt easily to new environments just like planet Earth.</li>
-                  </ol>
-                </div>
-              </section>
-
-              {/* SPOTIFY MAIN MAIN PLAYER DECK */}
-              <section className="cyber-card p-6 space-y-6 shadow-glow">
-                <div className="flex items-center justify-between border-b border-matrix/30 pb-4">
-                  <div className="flex items-center gap-2">
-                    <Music size={20} className="text-matrix-light animate-pulse" />
-                    <h2 className="text-lg font-bold tracking-widest text-matrix-light uppercase">SATELLITE_JAMMER // FAV MUSIC</h2>
-                  </div>
-                  <div className="text-[10px] text-matrix-dark font-mono uppercase tracking-widest">
-                    EMBEDDED_DECK_ACTIVE
-                  </div>
-                </div>
-
-                <div className="relative border border-matrix/40 rounded p-3 bg-black/90 shadow-glow-intense">
-
-                  {/* Decorative radio mainframe dials and meters */}
-                  <div className="flex justify-between items-center mb-3 px-1 border-b border-matrix-dark/20 pb-2">
-                    <div className="flex gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-matrix animate-ping" />
-                      <div className="text-[9px] text-matrix-light font-bold tracking-widest font-mono">TUNING: 88.4 MHz</div>
-                    </div>
-                    {/* Retro animated VU Level meters */}
-                    <div className="flex items-end gap-0.5 h-3">
-                      {[3, 6, 2, 8, 4, 7, 5].map((h, i) => (
-                        <div
-                          key={i}
-                          className="w-1 bg-matrix rounded-t"
-                          style={{
-                            height: `${h * 10}%`,
-                            animation: `bounce 0.8s ease infinite alternate`,
-                            animationDelay: `${i * 0.1}s`
-                          }}
-                        />
-                      ))}
-                    </div>
+                      {revealColor ? (
+                        <span className="text-white font-bold text-xs">SECRET</span>
+                      ) : (
+                        <GlitchText text="[REDACTED]" className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs cursor-pointer" />
+                      )}
+                    </button>
                   </div>
 
-                  <iframe
-                    title="Spotify Embed: Recommendation Playlist"
-                    src={`https://open.spotify.com/embed/playlist/3MEEl3gloZAUbEiCBFzm1m?utm_source=generator&theme=0`}
-                    width="100%"
-                    height="360px"
-                    frameBorder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    className="rounded border border-matrix-dark/30 opacity-90 hover:opacity-100 transition-opacity"
-                  />
+                  <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
+                    <span className="text-matrix/70 text-xs">SECRET</span>
+                    <button
+                      onClick={() => {
+                        if (audioEnabled) clickSound();
+                        setRevealBirthday(!revealBirthday);
+                      }}
+                      className="focus:outline-none"
+                    >
+                      {revealBirthday ? (
+                        <span className="text-white font-bold text-xs">NASA COMMENT SECTION</span>
+                      ) : (
+                        <GlitchText text="[REDACTED]" className="text-matrix-light bg-matrix-dark/30 px-1 border border-matrix/30 text-xs cursor-pointer" />
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="text-xs flex justify-between py-1">
+                    <span className="text-matrix/70">GEOLOCATION:</span>
+                    <span className="text-white">FROM_PLANET_MARS</span>
+                  </div>
+
+                  <div className="text-xs flex justify-between py-1">
+                    <span className="text-matrix/70">MOOD:</span>
+                    <span className="text-white font-bold">CHILL_STATE</span>
+                  </div>
+
+                  <div className="text-xs flex justify-between py-1">
+                    <span className="text-matrix/70">ENERGY_SRC:</span>
+                    <span className="text-matrix-light text-glow">COFFEE_AND_PROBABLY_SLEEPING</span>
+                  </div>
                 </div>
-              </section>
+              </div>
 
             </div>
+
           </main>
-
-          {/* INTERACTIVE CLI PANEL DRAWER */}
-          <section className="cyber-card shadow-glow overflow-hidden">
-            <button
-              onClick={() => {
-                if (audioEnabled) clickSound();
-                setCliOpen(!cliOpen);
-              }}
-              className="w-full flex items-center justify-between p-4 bg-matrix-dark/10 hover:bg-matrix-dark/20 text-xs font-bold font-mono tracking-widest text-matrix-light border-b border-matrix/20"
-            >
-              <div className="flex items-center gap-2">
-                <TerminalSquare size={16} className={cliOpen ? "animate-pulse" : ""} />
-                <span>INTERACTIVE_SYSTEM_SHELL</span>
-              </div>
-              <span className="text-[10px] px-2 py-0.5 border border-matrix/30 rounded bg-black">
-                {cliOpen ? "COLLAPSE_TERM" : "OPEN_TERM"}
-              </span>
-            </button>
-
-            <AnimatePresence>
-              {cliOpen && (
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: "auto" }}
-                  exit={{ height: 0 }}
-                  className="bg-black/95 p-4 space-y-4"
-                >
-                  <div className="h-44 overflow-y-auto font-mono text-xs text-matrix/90 space-y-1 bg-[#020202] p-3 border border-matrix-dark/40 rounded scrollbar-thin">
-                    {cliHistory.map((line, idx) => (
-                      <p key={idx} className="whitespace-pre-wrap">{line}</p>
-                    ))}
-                    <div className="flex items-center text-matrix-light mt-1">
-                      <span className="mr-2 text-matrix-dark font-bold font-mono">&gt;</span>
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          executeCommand(cliInput);
-                        }}
-                        className="flex-grow flex items-center"
-                      >
-                        <input
-                          type="text"
-                          value={cliInput}
-                          onChange={(e) => setCliInput(e.target.value)}
-                          className="bg-transparent border-none outline-none text-matrix-light flex-grow font-mono focus:ring-0 focus:border-none p-0 text-xs"
-                          placeholder="Type 'help' and press Enter..."
-                          autoFocus
-                        />
-                      </form>
-                    </div>
-                  </div>
-                  <div className="text-[9px] text-matrix-dark flex justify-between font-mono">
-                    <span>SECURITY_CLEARANCE: OPERATOR</span>
-                    <span>SHELL_VERSION: v2.0.4</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </section>
-
+          
           {/* SOCIALS & FOOTER */}
           <footer className="space-y-8 pt-8 border-t border-matrix/20 text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-matrix-dark uppercase tracking-widest font-bold">
@@ -1555,6 +1787,162 @@ export default function App() {
 
         </motion.div>
       )}
+
+      {/* 3. COGNITIVE ROBOT ASSISTANT SUBSYSTEM */}
+      <AnimatePresence>
+        {selectedTech && (
+          <motion.div
+            initial={{ y: 200, opacity: 0, scale: 0.95 }}
+            animate={{ 
+              y: 0, 
+              opacity: 1, 
+              scale: 1,
+              x: [0, -1, 1, 0],
+              transition: { 
+                y: { type: "spring", damping: 20 },
+                x: { repeat: Infinity, duration: 1.5, ease: "linear" }
+              }
+            }}
+            exit={{ y: 150, opacity: 0, scale: 0.95 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92vw] max-w-2xl z-50 bg-[#020202]/95 backdrop-blur-md border-2 border-matrix rounded-xl shadow-glow overflow-hidden select-none"
+          >
+            {/* Header / Hazard lines bar */}
+            <div className="flex items-center justify-between bg-matrix/10 border-b border-matrix/30 px-4 py-2 font-mono">
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  className="text-matrix font-bold tracking-tighter text-xs"
+                >
+                  🤖 [ ◉ _ ◉ ]
+                </motion.div>
+                <span className="text-[10px] text-matrix-light font-bold tracking-widest uppercase">
+                  SYS_ROBOT_INTELLIGENCE // INTERPRETING: {selectedTech.name.toUpperCase()}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  playRobotShutdown();
+                  setSelectedTech(null);
+                }}
+                className="text-matrix hover:text-white border border-matrix/30 hover:border-matrix bg-black px-1.5 py-0.5 rounded text-[9px] font-bold font-mono transition-all focus:outline-none"
+              >
+                CLOSE [X]
+              </button>
+            </div>
+
+            {/* Robot Content chassis */}
+            <div className="p-4 sm:p-6 space-y-4 font-mono text-xs text-matrix">
+              
+              {/* Dynamic Game Character Face */}
+              <div className="flex items-center gap-4 bg-matrix-dark/10 border border-matrix/20 p-3 rounded">
+                <div className="text-xl md:text-2xl font-bold bg-[#040404] px-3 py-1.5 rounded border border-matrix/10 text-matrix-light text-glow select-none tracking-widest animate-pulse">
+                  [ ◕ _ ◕ ]
+                </div>
+                <div className="text-[10px] text-matrix-light/80 leading-relaxed font-mono uppercase">
+                  "beep! Analyzing technical parameters. Telemetry indicates optimal compilation. Typewriter system active."
+                </div>
+              </div>
+
+              {/* Data logs */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-matrix/20 pt-4">
+                
+                <div className="sm:border-r border-matrix/15 pr-2">
+                  <span className="text-matrix-dark text-[9px] uppercase tracking-wider block font-bold mb-1">// COGNITIVE_ROLE</span>
+                  <p className="text-white text-[11px] font-sans leading-relaxed">
+                    <Typewriter text={selectedTech.systemRole} speed={12} onTick={typeTick} />
+                  </p>
+                </div>
+                
+                <div className="sm:border-r border-matrix/15 px-2">
+                  <span className="text-matrix-dark text-[9px] uppercase tracking-wider block font-bold mb-1">// OPERATOR_TRACK_RECORD</span>
+                  <p className="text-white text-[11px] font-sans leading-relaxed">
+                    <Typewriter text={selectedTech.xp} speed={12} onTick={typeTick} />
+                  </p>
+                </div>
+                
+                <div className="pl-2">
+                  <span className="text-matrix-dark text-[9px] uppercase tracking-wider block font-bold mb-1">// ASSOCIATED_PROJECTS</span>
+                  <p className="text-matrix-light text-[11px] font-sans font-bold leading-relaxed text-glow">
+                    <Typewriter text={selectedTech.projects} speed={12} onTick={typeTick} />
+                  </p>
+                </div>
+
+              </div>
+              
+              <div className="text-[8px] text-matrix-dark flex justify-between border-t border-matrix-dark/20 pt-2 uppercase font-bold">
+                <span>TELEMETRY_LOG: STABLE</span>
+                <span>ROBOT_STATUS: ACTIVE // FEED_LOCK</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 4. PERSISTENT FLOATING AUDIO CONTROLLER */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <motion.button
+          whileHover={{ scale: 1.1, boxShadow: "0 0 20px rgba(0, 255, 65, 0.5)" }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            if (audioEnabled) clickSound();
+            setSpotifyOpen(!spotifyOpen);
+          }}
+          className="w-12 h-12 rounded-full border-2 border-matrix bg-black flex items-center justify-center text-matrix shadow-glow transition-all focus:outline-none"
+        >
+          <motion.div
+            animate={spotifyOpen ? { rotate: 360 } : { rotate: 0 }}
+            transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+          >
+            <Music size={20} className="text-matrix-light" />
+          </motion.div>
+        </motion.button>
+      </div>
+
+      {/* Spotify Floating Window Panel */}
+      <AnimatePresence>
+        {spotifyOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 50 }}
+            className="fixed bottom-20 right-6 z-40 bg-[#020202]/95 backdrop-blur-md border border-matrix/30 rounded-xl p-3 w-80 max-w-[90vw] shadow-glow"
+          >
+            {/* Top window bar */}
+            <div className="flex justify-between items-center mb-2 px-1 border-b border-matrix/20 pb-1.5">
+              <div className="flex gap-2 items-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-matrix animate-ping" />
+                <span className="text-[9px] text-matrix-light font-bold tracking-widest font-mono">
+                  TUNING: 88.4 MHz // AUDIO_DECK
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  if (audioEnabled) clickSound();
+                  setSpotifyOpen(false);
+                }}
+                className="text-matrix-dark hover:text-matrix text-[9px] font-bold uppercase font-mono px-1 focus:outline-none"
+              >
+                [-]
+              </button>
+            </div>
+
+            <iframe
+              title="Spotify Embed: Recommendation Playlist"
+              src={`https://open.spotify.com/embed/playlist/3MEEl3gloZAUbEiCBFzm1m?utm_source=generator&theme=0`}
+              width="100%"
+              height="350px"
+              frameBorder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              className="rounded border border-matrix-dark/30 opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* WHITE WARP FLASH OVERLAY */}
       <AnimatePresence>
