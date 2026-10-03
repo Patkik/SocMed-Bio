@@ -1,124 +1,148 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Volume2, VolumeX, TerminalSquare } from 'lucide-react';
+import { Terminal, Volume2, VolumeX, ShieldAlert, FastForward, Sparkles, AlertTriangle, EyeOff } from 'lucide-react';
 import { useAudio, setGlobalAudioEnabled, getGlobalAudioEnabled } from '../hooks/useAudio';
 import { GlitchText } from './GlitchText';
 
-// Local log glitcher
-const GlitchLog: React.FC<{ text: string; isLast: boolean }> = ({ text, isLast }) => {
-  const [isGlitching, setIsGlitching] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsGlitching(false);
-    }, 450);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isGlitching) {
-    return (
-      <GlitchText
-        text={text}
-        className={isLast ? "text-matrix-light font-bold text-xs md:text-sm" : "text-matrix/80 text-xs md:text-sm"}
-      />
-    );
-  }
-
-  return (
-    <span className={isLast ? "text-matrix-light font-bold text-glow" : "text-matrix/80"}>
-      {text}
-    </span>
-  );
-};
-
 interface CockpitLoaderProps {
-  onComplete: () => void;
+  onComplete: (skipFlash?: boolean) => void;
 }
 
+type IntroStage = 'FLASH_WARNING' | 'WARP_ZOOM' | 'DOMAIN_REVEAL' | 'PORTAL_BREACH';
+
 export const CockpitLoader: React.FC<CockpitLoaderProps> = ({ onComplete }) => {
-  const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
-  const [audioEnabled, setAudioEnabled] = useState(getGlobalAudioEnabled());
-  const [loadStage, setLoadStage] = useState<'BOOTING' | 'READY_TO_LAUNCH' | 'CHARGING' | 'COUNTDOWN' | 'WARPING'>('BOOTING');
+  const [stage, setStage] = useState<IntroStage>('FLASH_WARNING');
   const [warpProgress, setWarpProgress] = useState(0);
-  const [countdown, setCountdown] = useState(3);
+  const [domainProgress, setDomainProgress] = useState(0);
+  const [audioEnabled, setAudioEnabled] = useState(getGlobalAudioEnabled());
+  const [flash, setFlash] = useState(false);
+  const [isSafeSkipping, setIsSafeSkipping] = useState(false);
 
-  const { initAudio, playWarpSound, playBoomSound, clickSound, synthBeep, playRawSound } = useAudio();
-  const loadingCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const {
+    initAudio,
+    playWarpSound,
+    playBoomSound,
+    clickSound,
+    synthBeep,
+    warningSound,
+    playRawSound
+  } = useAudio();
 
-  // References to prevent canvas re-initialization during updates
-  const loadStageRef = useRef(loadStage);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const stageRef = useRef<IntroStage>(stage);
   const warpProgressRef = useRef(warpProgress);
 
   useEffect(() => {
-    loadStageRef.current = loadStage;
-  }, [loadStage]);
+    stageRef.current = stage;
+  }, [stage]);
 
   useEffect(() => {
     warpProgressRef.current = warpProgress;
   }, [warpProgress]);
 
-  const bootSequences = [
-    "INITIATING COGNITIVE BOOT PROTOCOLS...",
-    "ACCESSING CORE://PATRICK_JOSH_ANEDEZ...",
-    "LOADING BIOMETRIC_DATA: ...",
-    "SYSTEM VARIABLES: Night_Owl = TRUE // Mood = CHILL",
-    "BYPASSING SECURITY FIREWALL LEVELS 1-4...",
-    "WARNING: REDACTED_PARAMETERS ENCOUNTERED...",
-    "DECRYPTING DINOSAUR_GENOME_SEQUENCE [88% MATCH]...",
-    "COMPILING CORE SYSTEM INTEL...",
-    "ACCESS GRANTED. WELCOME BACK, OPERATOR."
-  ];
+  // Fast forward / safe skip handler (Zero flashes, clean exit)
+  const handleSafeSkip = useCallback(() => {
+    clickSound();
+    setIsSafeSkipping(true);
+    onComplete(true);
+  }, [clickSound, onComplete]);
 
-  // 1. Boot Logger Sequence
+  // Proceed to warp zoom animation (Requires explicit user permission/click)
+  const handleProceedToWarp = useCallback(() => {
+    clickSound();
+    setStage('WARP_ZOOM');
+  }, [clickSound]);
+
+  // Keyboard shortcut listener
   useEffect(() => {
-    let logIndex = 0;
-    const interval = setInterval(() => {
-      if (logIndex < bootSequences.length) {
-        setTerminalLogs((prev) => [...prev, bootSequences[logIndex]]);
-        if (audioEnabled) playRawSound(600 + logIndex * 100, 'sine', 0.1, 0.02);
-        logIndex++;
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
-          setLoadStage('READY_TO_LAUNCH');
-          if (audioEnabled) synthBeep();
-        }, 850);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleSafeSkip();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (stage === 'FLASH_WARNING') {
+          handleProceedToWarp();
+        } else {
+          handleSafeSkip();
+        }
       }
-    }, 450);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [stage, handleProceedToWarp, handleSafeSkip]);
+
+  // STAGE 0: FLASH_WARNING Sound ping (No auto-proceed; waits for viewer permission)
+  useEffect(() => {
+    if (stage === 'FLASH_WARNING' && audioEnabled) {
+      warningSound();
+    }
+  }, [stage, audioEnabled, warningSound]);
+
+  // STAGE 1: WARP_ZOOM (0 to 100 over ~2.4 seconds)
+  useEffect(() => {
+    if (stage !== 'WARP_ZOOM') return;
+
+    if (audioEnabled) {
+      playWarpSound();
+    }
+
+    const interval = setInterval(() => {
+      setWarpProgress((prev) => {
+        const next = prev + 2.5;
+        if (next >= 100) {
+          clearInterval(interval);
+          // Trigger shockwave flash transition
+          setFlash(true);
+          setTimeout(() => setFlash(false), 300);
+
+          if (audioEnabled) {
+            playBoomSound();
+            setTimeout(() => {
+              warningSound();
+            }, 120);
+          }
+
+          setStage('DOMAIN_REVEAL');
+          return 100;
+        }
+        return next;
+      });
+    }, 55);
 
     return () => clearInterval(interval);
-  }, [audioEnabled, playRawSound, synthBeep]);
+  }, [stage, audioEnabled, playWarpSound, playBoomSound, warningSound]);
 
-  // 2. Countdown sequence
+  // STAGE 2: DOMAIN_REVEAL (Progress bar & holding ~2.8 seconds)
   useEffect(() => {
-    if (loadStage !== 'COUNTDOWN') return;
-
-    let timer = 3;
-    setCountdown(timer);
+    if (stage !== 'DOMAIN_REVEAL') return;
 
     const interval = setInterval(() => {
-      timer -= 1;
-      setCountdown(timer);
-      if (audioEnabled) playRawSound(300, 'square', 0.15, 0.05);
-
-      if (timer <= 0) {
-        clearInterval(interval);
-        setLoadStage('WARPING');
-        playBoomSound();
-
-        setTimeout(() => {
-          onComplete();
-        }, 1600);
-      }
-    }, 800);
+      setDomainProgress((prev) => {
+        const next = prev + 3;
+        if (next >= 100) {
+          clearInterval(interval);
+          // Transition to PORTAL_BREACH -> Main Screen
+          setStage('PORTAL_BREACH');
+          if (audioEnabled) {
+            synthBeep();
+          }
+          setTimeout(() => {
+            onComplete(false);
+          }, 500);
+          return 100;
+        }
+        return next;
+      });
+    }, 80);
 
     return () => clearInterval(interval);
-  }, [loadStage, audioEnabled, playRawSound, playBoomSound, onComplete]);
+  }, [stage, audioEnabled, synthBeep, onComplete]);
 
-  // 3. Optimized Starfield Animation Canvas loop (runs once, reads parameters from refs)
+  // 3D Hyperspace Warp Canvas Loop
   useEffect(() => {
-    if (!loadingCanvasRef.current) return;
-    const canvas = loadingCanvasRef.current;
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -131,71 +155,103 @@ export const CockpitLoader: React.FC<CockpitLoaderProps> = ({ onComplete }) => {
     };
     window.addEventListener('resize', handleResize);
 
-    const numStars = 250;
-    const stars: Array<{ x: number; y: number; z: number; color: string }> = [];
+    const numStars = 350;
+    const stars: Array<{ x: number; y: number; z: number; color: string; speedOffset: number }> = [];
     for (let i = 0; i < numStars; i++) {
       stars.push({
-        x: (Math.random() - 0.5) * 1000,
-        y: (Math.random() - 0.5) * 1000,
-        z: Math.random() * 1000,
-        color: `rgba(0, 255, 65, ${0.4 + Math.random() * 0.6})`
+        x: (Math.random() - 0.5) * 1400,
+        y: (Math.random() - 0.5) * 1400,
+        z: Math.random() * 1000 + 1,
+        color: Math.random() > 0.85 ? '#ffffff' : '#00ff66',
+        speedOffset: 0.8 + Math.random() * 0.4
       });
     }
 
     let animationFrameId: number;
 
     const draw = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-      ctx.fillRect(0, 0, width, height);
-
-      let speed = 2.5;
-      const stage = loadStageRef.current;
+      const currentStage = stageRef.current;
       const progress = warpProgressRef.current;
 
-      if (stage === 'CHARGING') {
-        speed = 2.5 + (progress / 100) * 18;
-      } else if (stage === 'COUNTDOWN') {
-        speed = 22;
-      } else if (stage === 'WARPING') {
-        speed = 60;
+      // Background fade trails
+      if (currentStage === 'WARP_ZOOM') {
+        ctx.fillStyle = 'rgba(2, 4, 3, 0.28)';
+      } else if (currentStage === 'PORTAL_BREACH') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      } else if (currentStage === 'FLASH_WARNING') {
+        ctx.fillStyle = 'rgba(2, 4, 3, 0.6)';
+      } else {
+        ctx.fillStyle = 'rgba(2, 4, 3, 0.4)';
+      }
+      ctx.fillRect(0, 0, width, height);
+
+      // Speed tuning based on stage
+      let baseSpeed = 1.0;
+      if (currentStage === 'FLASH_WARNING') {
+        // Calm, safe background drifting before animation
+        baseSpeed = 0.8;
+      } else if (currentStage === 'WARP_ZOOM') {
+        // Accelerating warp zoom curve
+        baseSpeed = 6 + (progress / 100) * 75;
+      } else if (currentStage === 'DOMAIN_REVEAL') {
+        // Smooth atmospheric star drift
+        baseSpeed = 3.5;
+      } else if (currentStage === 'PORTAL_BREACH') {
+        // Final hyperdrive burst
+        baseSpeed = 95;
       }
 
-      ctx.lineWidth = stage === 'WARPING' ? 4 : 1.5;
+      ctx.lineWidth = (currentStage === 'DOMAIN_REVEAL' || currentStage === 'FLASH_WARNING') ? 1.5 : 2.5;
+
+      const centerX = width / 2;
+      const centerY = height / 2;
 
       for (let i = 0; i < numStars; i++) {
         const star = stars[i];
         const pz = star.z;
-        star.z -= speed;
+        star.z -= baseSpeed * star.speedOffset;
 
         if (star.z <= 0) {
-          star.x = (Math.random() - 0.5) * 1000;
-          star.y = (Math.random() - 0.5) * 1000;
+          star.x = (Math.random() - 0.5) * 1400;
+          star.y = (Math.random() - 0.5) * 1400;
           star.z = 1000;
           continue;
         }
 
-        const k = 400;
-        const x = (star.x / star.z) * k + width / 2;
-        const y = (star.y / star.z) * k + height / 2;
+        const k = 450;
+        const x = (star.x / star.z) * k + centerX;
+        const y = (star.y / star.z) * k + centerY;
 
-        const px = (star.x / pz) * k + width / 2;
-        const py = (star.y / pz) * k + height / 2;
+        const px = (star.x / pz) * k + centerX;
+        const py = (star.y / pz) * k + centerY;
 
-        const size = (1 - star.z / 1000) * 3;
+        const size = Math.max(0.5, (1 - star.z / 1000) * 2.8);
 
         if (x >= 0 && x <= width && y >= 0 && y <= height) {
-          ctx.beginPath();
-          ctx.strokeStyle = star.color;
-          if (stage === 'WARPING' || stage === 'COUNTDOWN') {
+          if (currentStage === 'WARP_ZOOM' || currentStage === 'PORTAL_BREACH') {
+            ctx.beginPath();
+            ctx.strokeStyle = star.color;
             ctx.moveTo(px, py);
             ctx.lineTo(x, y);
             ctx.stroke();
           } else {
+            // Calm point rendering during flash warning & domain reveal
+            ctx.beginPath();
             ctx.fillStyle = star.color;
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
           }
         }
+      }
+
+      // Center tunnel rings only during active warp zoom
+      if (currentStage === 'WARP_ZOOM') {
+        const ringProgress = (progress % 50) / 50;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, ringProgress * (width * 0.4), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0, 255, 102, ${(1 - ringProgress) * 0.15})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
       }
     };
 
@@ -212,320 +268,307 @@ export const CockpitLoader: React.FC<CockpitLoaderProps> = ({ onComplete }) => {
     };
   }, []);
 
-  const handleInitiateWarp = () => {
-    setLoadStage('CHARGING');
-    playWarpSound();
-
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 2;
-      setWarpProgress(progress);
-      if (progress >= 100) {
-        clearInterval(interval);
-        setLoadStage('COUNTDOWN');
-      }
-    }, 60);
-  };
-
   return (
     <motion.div
-      className="fixed inset-0 z-50 bg-[#020202] flex flex-col justify-between overflow-hidden p-4 md:p-8"
-      exit={{
-        scale: 1.8,
-        opacity: 0,
-        filter: "blur(30px)",
-        transition: { duration: 1, ease: [0.76, 0, 0.24, 1] }
-      }}
+      className="fixed inset-0 z-50 bg-[#020403] flex flex-col justify-between overflow-hidden p-4 md:p-8 select-none font-mono"
+      exit={
+        isSafeSkipping
+          ? {
+              opacity: 0,
+              transition: { duration: 0.25, ease: "easeOut" }
+            }
+          : {
+              scale: 1.4,
+              opacity: 0,
+              filter: "blur(20px)",
+              transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+            }
+      }
     >
-      {/* Starfield Background Canvas */}
+      {/* Dynamic Starfield Canvas */}
       <canvas
-        ref={loadingCanvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-60 z-0"
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none opacity-85 z-0"
       />
 
-      {/* Cockpit framing */}
-      <div className="absolute inset-0 border-[10px] md:border-[16px] border-matrix-dark/20 pointer-events-none z-10" />
-      <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#00ff41]/5 to-transparent pointer-events-none z-10" />
-      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#00ff41]/5 to-transparent pointer-events-none z-10" />
+      {/* Screen flash transition shockwave (only fires during stage transitions) */}
+      <AnimatePresence>
+        {flash && (
+          <motion.div
+            initial={{ opacity: 0.9 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="absolute inset-0 bg-[#00ff66] pointer-events-none z-40 mix-blend-screen"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Cockpit HUD Structural Brackets */}
-      <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-matrix/40 z-10 hidden md:block" />
-      <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-matrix/40 z-10 hidden md:block" />
-      <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-matrix/40 z-10 hidden md:block" />
-      <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-matrix/40 z-10 hidden md:block" />
+      {/* Cockpit HUD Structural Vignette */}
+      <div className="absolute inset-0 border-[8px] md:border-[14px] border-[#00ff66]/15 pointer-events-none z-10" />
+      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10" />
+      <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-10" />
 
-      {/* STATUS TOP BAR */}
-      <div className="flex items-center justify-between border-b border-matrix/20 pb-2 z-20 select-none max-w-7xl mx-auto w-full">
+      {/* Corner Brackets */}
+      <div className="absolute top-5 left-5 w-10 h-10 border-t-2 border-l-2 border-[#00ff66]/40 z-10 hidden sm:block" />
+      <div className="absolute top-5 right-5 w-10 h-10 border-t-2 border-r-2 border-[#00ff66]/40 z-10 hidden sm:block" />
+      <div className="absolute bottom-5 left-5 w-10 h-10 border-b-2 border-l-2 border-[#00ff66]/40 z-10 hidden sm:block" />
+      <div className="absolute bottom-5 right-5 w-10 h-10 border-b-2 border-r-2 border-[#00ff66]/40 z-10 hidden sm:block" />
+
+      {/* TOP STATUS BAR */}
+      <header className="flex items-center justify-between border-b border-[#00ff66]/20 pb-3 z-20 max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-2">
-          <Terminal className="animate-pulse text-matrix" size={16} />
-          <span className="text-[10px] md:text-xs text-matrix-light font-bold uppercase tracking-widest text-glow font-mono">
-            COCKPIT_HUD_SECURE_LINK // SYS: ACTIVE
+          <Terminal className="text-[#00ff66] animate-pulse" size={15} />
+          <span className="text-[10px] md:text-xs text-[#00ff66] font-bold tracking-widest text-glow">
+            SPATIAL TRANSIT HUD // APEX PROTOCOL
           </span>
         </div>
 
-        <button
-          onClick={() => {
-            initAudio();
-            const nextVal = !audioEnabled;
-            setAudioEnabled(nextVal);
-            setGlobalAudioEnabled(nextVal);
-            setTimeout(() => { if (nextVal) clickSound(); }, 50);
-          }}
-          className={`px-2 py-0.5 text-[9px] border rounded transition-all flex items-center gap-1 font-mono ${
-            audioEnabled ? 'border-matrix bg-matrix-dark/20 text-matrix-light' : 'border-matrix-dark text-matrix/50'
-          }`}
-        >
-          {audioEnabled ? <Volume2 size={10} /> : <VolumeX size={10} />}
-          <span>{audioEnabled ? "SYNTH_ON" : "SYNTH_MUTED"}</span>
-        </button>
-      </div>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={() => {
+              initAudio();
+              const nextVal = !audioEnabled;
+              setAudioEnabled(nextVal);
+              setGlobalAudioEnabled(nextVal);
+              if (nextVal) playRawSound(800, 'sine', 0.1, 0.03);
+            }}
+            className={`px-2.5 py-1 text-[10px] border rounded transition-colors flex items-center gap-1.5 ${
+              audioEnabled
+                ? 'border-[#00ff66]/50 bg-[#00ff66]/10 text-[#00ff66]'
+                : 'border-zinc-800 text-zinc-500 hover:text-zinc-400'
+            }`}
+          >
+            {audioEnabled ? <Volume2 size={12} /> : <VolumeX size={12} />}
+            <span className="hidden xs:inline">{audioEnabled ? "AUDIO ON" : "MUTED"}</span>
+          </button>
 
-      {/* 3D COCKPIT INSTRUMENT LAYOUT */}
-      <div
-        className="flex-grow flex flex-col lg:flex-row justify-center items-center gap-6 max-w-7xl mx-auto w-full z-20 py-4"
-        style={{
-          transform: loadStage === 'WARPING' ? 'translate(calc(Math.random() * 4px - 2px), calc(Math.random() * 4px - 2px))' : 'none'
-        }}
-      >
-        {/* LEFT PANEL */}
-        <div className="hidden lg:flex flex-col gap-4 w-44 shrink-0 bg-black/60 border border-matrix/10 p-3 rounded font-mono text-[9px] text-matrix-dark shadow-glow">
-          <div className="border-b border-matrix/20 pb-1 mb-1 font-bold text-matrix">FLIGHT_SYSTEMS</div>
-          <div className="space-y-1.5">
-            <div className="flex justify-between"><span>REACTOR_TEMP:</span><span className="text-matrix-light">324.8 C</span></div>
-            <div className="flex justify-between"><span>CORE_PRESSURE:</span><span className="text-matrix-light">88.4 kPa</span></div>
-            <div className="flex justify-between"><span>VECTOR_CALIBR:</span><span className="text-matrix-light">PASS</span></div>
-            <div className="flex justify-between"><span>GRAVITY_NODE:</span><span className="text-matrix-light">G-1.02</span></div>
-          </div>
-
-          <div className="mt-4 border-b border-matrix/20 pb-1 mb-1 font-bold text-matrix">RADAR_SWEEP</div>
-          <div className="h-20 border border-matrix/10 rounded relative flex items-center justify-center bg-[#010101] overflow-hidden">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-              className="absolute w-20 h-0.5 bg-gradient-to-r from-matrix/50 to-transparent origin-left"
-              style={{ left: '50%' }}
-            />
-            <div className="w-12 h-12 rounded-full border border-matrix-dark/20" />
-            <div className="w-6 h-6 rounded-full border border-matrix-dark/10" />
-            <div className="absolute text-[8px] text-matrix-light animate-pulse">// 🦕 DINO DETECTED</div>
-          </div>
+          <button
+            onClick={handleSafeSkip}
+            className="px-2.5 py-1 text-[10px] border border-zinc-700 hover:border-[#00ff66]/50 bg-black/60 hover:bg-[#00ff66]/10 text-zinc-300 hover:text-[#00ff66] rounded transition-all flex items-center gap-1 font-mono font-medium"
+            title="Press Space or Esc to skip"
+          >
+            <span>SKIP</span>
+            <FastForward size={11} />
+          </button>
         </div>
+      </header>
 
-        {/* CENTER Holographic HUD */}
-        <motion.div
-          animate={loadStage === 'WARPING' ? {
-            x: [0, -3, 3, -2, 2, 0],
-            y: [0, 2, -3, 1, -2, 0],
-            rotateZ: [0, -0.5, 0.5, 0]
-          } : {}}
-          transition={loadStage === 'WARPING' ? {
-            repeat: Infinity,
-            duration: 0.15
-          } : {}}
-          className="flex-grow flex flex-col justify-center items-center max-w-3xl w-full border-2 border-matrix/30 bg-black/85 p-6 rounded relative shadow-glow-intense overflow-hidden animate-pulse"
-          style={{
-            transform: "perspective(1000px) rotateX(10deg)",
-            transformStyle: "preserve-3d",
-            animationDuration: '6s'
-          }}
-        >
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-matrix/5 via-transparent to-matrix/5" />
-
-          {/* STAGE BOOTING */}
-          {loadStage === 'BOOTING' && (
-            <div className="w-full flex flex-col justify-between min-h-[300px]">
-              <div className="space-y-2 h-[260px] overflow-y-auto pr-2 scrollbar-thin text-left font-mono">
-                {terminalLogs.map((log, index) => {
-                  const isLast = index === bootSequences.length - 1;
-                  return (
-                    <motion.p
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-xs flex items-start gap-1"
-                    >
-                      <span className="text-matrix-dark mr-1 shrink-0">&gt;&gt;</span>
-                      <GlitchLog text={log} isLast={isLast} />
-                    </motion.p>
-                  );
-                })}
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.8 }}
-                  className="inline-block w-2 h-3.5 bg-matrix ml-1 align-middle"
-                />
-              </div>
-              <div className="text-[10px] text-matrix-dark flex justify-between border-t border-matrix/10 pt-2 uppercase font-bold tracking-widest mt-4 font-mono">
-                <span>DECRYPTING_COGNITIVE_NODES</span>
-                <span>{Math.round((terminalLogs.length / bootSequences.length) * 100)}%</span>
-              </div>
-            </div>
-          )}
-
-          {/* STAGE READY TO LAUNCH */}
-          {loadStage === 'READY_TO_LAUNCH' && (
+      {/* CENTER STAGE CONTAINER */}
+      <main className="flex-grow flex items-center justify-center max-w-4xl mx-auto w-full z-20 px-4">
+        <AnimatePresence mode="wait">
+          {/* ── PHASE 0: FLASH & PHOTOSENSITIVITY WARNING ───────────── */}
+          {stage === 'FLASH_WARNING' && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-6 space-y-6 flex flex-col items-center justify-center min-h-[300px] w-full font-mono"
+              key="flash-warning"
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center w-full space-y-6 max-w-xl p-6 sm:p-8 rounded-2xl bg-black/90 border-2 border-amber-500/50 shadow-[0_0_35px_rgba(245,158,11,0.25)] relative overflow-hidden"
             >
+              {/* Subtle hazard stripes pattern banner */}
+              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-amber-500 via-[#00ff66] to-amber-500" />
+
+              {/* Eyebrow badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 text-[10px] font-bold tracking-widest uppercase">
+                <AlertTriangle size={13} className="animate-pulse" />
+                <span>PHOTOSENSITIVITY & FLASH WARNING</span>
+              </div>
+
+              {/* Warning Content */}
               <div className="space-y-3">
-                <div className="bg-matrix/10 border border-matrix/30 text-matrix-light text-[10px] font-bold py-1 px-4 rounded inline-block uppercase tracking-widest animate-pulse shadow-glow">
-                  COCKPIT SYSTEMS ACTIVE // DEPLOY_READY
-                </div>
-                <h2 className="text-xl md:text-3xl font-black text-white uppercase tracking-wider text-glow leading-snug">
-                  YOU ARE ABOUT TO ENTER <br />
-                  <span className="text-matrix-light animate-cyber-glitch font-black" data-text="PATRICK JOSH'S DOMAIN">PATRICK JOSH'S DOMAIN</span>
-                </h2>
-                <p className="text-[10px] md:text-xs text-matrix-light/60 max-w-md mx-auto uppercase font-bold tracking-widest animate-pulse">
-                  WARP DRIVE SYSTEMS STANDING BY. BE READY FOR LAUNCH SEQUENCE.
+                <h1 className="text-xl sm:text-3xl font-black text-white uppercase tracking-tight">
+                  VISUAL INTENSITY NOTICE
+                </h1>
+                <p className="text-xs sm:text-sm text-zinc-300 font-mono leading-relaxed max-w-md mx-auto">
+                  This intro contains <strong className="text-amber-400 font-bold">rapid flashing lights, strobe shockwaves, and high-speed warp zoom transitions</strong>. Viewer discretion is advised for individuals sensitive to flashing visual effects.
                 </p>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0px 0px 25px rgba(0,255,65,0.6)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleInitiateWarp}
-                className="px-8 py-4 border-2 border-matrix bg-matrix-dark/20 text-matrix-light hover:bg-matrix hover:text-black text-glow text-xs font-black uppercase rounded tracking-widest flex items-center gap-2 cursor-pointer transition-all shadow-glow border-glow"
-              >
-                <TerminalSquare size={14} className="animate-spin" style={{ animationDuration: '3s' }} />
-                <span>INITIATE HYPERSPACE LAUNCH</span>
-              </motion.button>
-            </motion.div>
-          )}
-
-          {/* STAGE CHARGING */}
-          {loadStage === 'CHARGING' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-6 space-y-6 w-full flex flex-col justify-center min-h-[300px] font-mono"
-            >
-              <div className="space-y-2">
-                <div className="text-[10px] text-matrix font-bold tracking-widest uppercase animate-pulse">
-                  CHARGING HYPERDRIVE DRIVE CORES
-                </div>
-                <div className="text-3xl md:text-5xl font-black text-white tracking-widest text-glow">
-                  {warpProgress}%
-                </div>
-                <p className="text-[10px] text-matrix-light/70 uppercase font-bold animate-pulse">
-                  VECTOR STABILIZATION IN PROGRESS... DO NOT INTERRUPT
-                </p>
-              </div>
-
-              <div className="w-full max-w-md mx-auto bg-matrix-dark/20 border border-matrix/20 h-4 rounded-full overflow-hidden p-0.5 shadow-glow">
-                <motion.div
-                  className="bg-matrix h-full rounded-full shadow-glow"
-                  style={{ width: `${warpProgress}%` }}
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto text-[8px] text-matrix-dark font-mono uppercase font-bold">
-                <div className="border border-matrix-dark/20 p-1">SYS: REFLUX</div>
-                <div className="border border-matrix-dark/20 p-1 animate-pulse text-matrix-light">WARP_STABLE</div>
-                <div className="border border-matrix-dark/20 p-1">VOLT: 8.8kV</div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STAGE COUNTDOWN */}
-          {loadStage === 'COUNTDOWN' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-6 space-y-6 flex flex-col items-center justify-center min-h-[300px] w-full font-mono"
-            >
-              <div className="space-y-1">
-                <div className="bg-red-950/20 border border-red-500/30 text-red-400 text-[10px] font-bold py-1 px-4 rounded inline-block uppercase tracking-widest animate-pulse shadow-glow-red">
-                  HYPERSPACE DEPLOYMENT DETECTED
-                </div>
-                <h3 className="text-xs font-black text-matrix-light uppercase tracking-widest pt-2 text-glow">
-                  YOU ARE ABOUT TO ENTER PATRICK JOSH'S DOMAIN, BE READY!
-                </h3>
-              </div>
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={countdown}
-                  initial={{ scale: 0.2, opacity: 0, rotateY: 90 }}
-                  animate={{ scale: 1.2, opacity: 1, rotateY: 0 }}
-                  exit={{ scale: 2, opacity: 0, filter: "blur(8px)" }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="text-7xl md:text-9xl font-black text-matrix-light text-glow select-none"
+              {/* Actions Grid */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  onClick={handleProceedToWarp}
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#00ff66] hover:bg-[#00E55C] text-black font-black text-xs tracking-wider uppercase transition-all shadow-glow flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  {countdown}
-                </motion.div>
-              </AnimatePresence>
+                  <Sparkles size={14} />
+                  <span>INITIATE WARP SEQUENCE</span>
+                </button>
+
+                <button
+                  onClick={handleSafeSkip}
+                  className="w-full sm:w-auto px-5 py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white font-mono text-xs tracking-wider uppercase transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <EyeOff size={14} className="text-zinc-400" />
+                  <span>SKIP INTRO (SAFE MODE)</span>
+                </button>
+              </div>
+
+              {/* Viewer permission indicator */}
+              <div className="text-[11px] text-zinc-400 font-mono pt-1">
+                Viewer permission required to start • Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-white text-[10px]">Enter</kbd> to launch or <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-white text-[10px]">Esc</kbd> to skip intro
+              </div>
             </motion.div>
           )}
 
-          {/* STAGE WARPING */}
-          {loadStage === 'WARPING' && (
+          {/* ── PHASE 1: WARPING / ZOOMING IN ───────────────────────── */}
+          {stage === 'WARP_ZOOM' && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-6 space-y-6 flex flex-col items-center justify-center min-h-[300px] w-full font-mono"
+              key="warp-zoom"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.25, filter: "blur(10px)" }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center w-full space-y-6 max-w-xl"
             >
+              {/* Telemetry pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] text-[10px] tracking-widest uppercase font-bold shadow-glow">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00ff66] animate-ping" />
+                <span>HYPERDRIVE ENGAGED • WARPING ZOOM IN</span>
+              </div>
+
+              {/* Central Speed Readout */}
               <div className="space-y-2">
-                <div className="text-red-500 font-bold uppercase text-xs tracking-widest animate-ping">
-                  // WARNING: ABSOLUTE WARPING //
-                </div>
-                <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-wider animate-pulse text-glow-red">
-                  WARP ENGAGED!
-                </h2>
-                <p className="text-[10px] text-matrix-light/60 uppercase font-bold tracking-widest animate-pulse">
-                  LANDING IN PATRICK JOSH'S SYSTEMS...
+                <motion.div
+                  animate={{
+                    scale: [1, 1.03, 1],
+                    textShadow: [
+                      "0 0 10px rgba(0,255,102,0.4)",
+                      "0 0 25px rgba(0,255,102,0.8)",
+                      "0 0 10px rgba(0,255,102,0.4)"
+                    ]
+                  }}
+                  transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+                  className="text-4xl sm:text-6xl font-black text-white tracking-widest"
+                >
+                  WARP {(1 + (warpProgress / 100) * 8.9).toFixed(1)}c
+                </motion.div>
+                <p className="text-xs text-zinc-300 font-mono tracking-wider">
+                  FOLDING SPACE-TIME COORDINATES...
                 </p>
               </div>
 
-              <div className="w-16 h-1 bg-red-500 animate-pulse mt-4 shadow-glow-red" />
+              {/* Progress gauge bar */}
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <div className="w-full bg-black/80 border border-[#00ff66]/30 h-2.5 rounded-full overflow-hidden p-0.5 shadow-glow">
+                  <motion.div
+                    className="bg-[#00ff66] h-full rounded-full shadow-glow"
+                    style={{ width: `${warpProgress}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
+                  <span>VELOCITY ACCELERATION</span>
+                  <span className="text-[#00ff66] font-bold">{Math.round(warpProgress)}%</span>
+                </div>
+              </div>
+
+              <div className="text-[10px] text-zinc-500 font-mono">
+                [PRESS SPACE OR CLICK SKIP TO JUMP DIRECTLY]
+              </div>
             </motion.div>
           )}
-        </motion.div>
 
-        {/* RIGHT PANEL */}
-        <div className="hidden lg:flex flex-col gap-4 w-44 shrink-0 bg-black/60 border border-matrix/10 p-3 rounded font-mono text-[9px] text-matrix-dark shadow-glow">
-          <div className="border-b border-matrix/20 pb-1 mb-1 font-bold text-matrix">WARP_STABILIZER</div>
-          <div className="space-y-1.5">
-            <div className="flex justify-between"><span>CORE_STABILITY:</span><span className="text-matrix-light">{loadStage === 'WARPING' ? '9.4%' : '99.8%'}</span></div>
-            <div className="flex justify-between"><span>GRID_CONVERG:</span><span className="text-matrix-light">94.8%</span></div>
-            <div className="flex justify-between"><span>WARP_GATE:</span><span className="text-matrix-light">OPEN</span></div>
-          </div>
+          {/* ── PHASE 2: YOU ARE ABOUT TO ENTER PATRICK JOSH'S DOMAIN ── */}
+          {stage === 'DOMAIN_REVEAL' && (
+            <motion.div
+              key="domain-reveal"
+              initial={{ opacity: 0, scale: 0.85, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1.3, filter: "blur(14px)" }}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              onClick={handleSafeSkip}
+              className="text-center w-full space-y-6 max-w-2xl cursor-pointer p-6 sm:p-8 rounded-2xl bg-black/80 border-2 border-[#00ff66]/40 shadow-glow-intense relative overflow-hidden"
+            >
+              {/* Subtle scanning highlight */}
+              <div className="absolute inset-0 bg-gradient-to-b from-[#00ff66]/5 via-transparent to-[#00ff66]/5 pointer-events-none" />
 
-          <div className="mt-4 border-b border-matrix/20 pb-1 mb-1 font-bold text-matrix">REACTOR_CORE</div>
-          <div className="w-full bg-[#050505] h-20 rounded border border-matrix/10 relative overflow-hidden flex flex-col justify-end p-1">
-            <div className="flex justify-between items-end gap-1 h-full">
-              {[5, 8, 3, 9, 6, 7].map((b, i) => {
-                let level = b;
-                if (loadStage === 'CHARGING') level = Math.min(10, Math.floor(b * (warpProgress / 100) + 1));
-                if (loadStage === 'COUNTDOWN') level = 9;
-                if (loadStage === 'WARPING') level = 10;
-                return (
-                  <div
-                    key={i}
-                    className={`w-full rounded-t transition-all ${level > 8 ? 'bg-red-500 shadow-glow-red' : 'bg-matrix'}`}
-                    style={{ height: `${level * 10}%` }}
+              {/* Warning Header Chip */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-widest">
+                <ShieldAlert size={12} className="animate-pulse" />
+                <span>SPATIAL TRANSITION // GATEWAY DETECTED</span>
+              </div>
+
+              {/* CORE HEADLINE: "YOU ARE ABOUT TO ENTER PATRICK JOSH'S DOMAIN" */}
+              <div className="space-y-3">
+                <span className="text-xs md:text-sm font-mono text-zinc-300 uppercase tracking-widest block font-medium">
+                  CAUTION: NEURAL LINK SYNCHRONIZING
+                </span>
+                <h1 className="text-2xl xs:text-3xl sm:text-5xl font-black text-white uppercase tracking-tight leading-tight">
+                  YOU ARE ABOUT TO ENTER <br />
+                  <span className="text-[#00ff66] text-glow font-black inline-block mt-1">
+                    <GlitchText text="PATRICK JOSH'S DOMAIN" />
+                  </span>
+                </h1>
+                <p className="text-xs text-zinc-400 max-w-md mx-auto pt-1 font-mono">
+                  All systems calibrated. Initializing developer mainframe and interactive portfolio deck.
+                </p>
+              </div>
+
+              {/* Domain Entry Synchronization Bar */}
+              <div className="max-w-md mx-auto space-y-2">
+                <div className="w-full bg-black/90 border border-[#00ff66]/30 h-2 rounded-full overflow-hidden p-0.5 shadow-glow">
+                  <motion.div
+                    className="bg-[#00ff66] h-full rounded-full shadow-glow"
+                    style={{ width: `${domainProgress}%` }}
                   />
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
+                </div>
+                <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                  <span className="flex items-center gap-1.5 text-[#00ff66]">
+                    <Sparkles size={11} />
+                    <span>ENTERING DOMAIN</span>
+                  </span>
+                  <span className="text-[#00ff66] font-bold">{Math.round(domainProgress)}%</span>
+                </div>
+              </div>
 
-      {/* COCKPIT STATUS BOTTOM SUMMARY */}
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-between text-[9px] text-matrix-dark border-t border-matrix/20 pt-2 z-20 select-none font-mono">
-        <span className="animate-pulse uppercase">
-          SYS_STATUS: {loadStage}
-        </span>
-        <span className="uppercase font-bold text-matrix-light tracking-wider">
-          {loadStage === 'BOOTING' && "INITIALIZING SYSTEM_LINK"}
-          {loadStage === 'READY_TO_LAUNCH' && "HYPERDRIVE READY FOR LAUNCH"}
-          {loadStage === 'CHARGING' && `CHARGING STABLE DRIVES (${warpProgress}%)`}
-          {loadStage === 'COUNTDOWN' && "COMMENCING WARP SEQUENCE IN T-MINUS"}
-          {loadStage === 'WARPING' && "WARNING: WARPING SPEED ACTIVE"}
-        </span>
-      </div>
+              {/* Technical Badges */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[10px] text-zinc-400">
+                <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">#FULL_STACK_ARCHITECT</span>
+                <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[#00ff66]">#BUKSU_CMS_V2</span>
+                <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">#TERMINAL_HUD</span>
+              </div>
+
+              <div className="text-[10px] text-zinc-500 pt-2 font-mono">
+                [CLICK ANYWHERE OR PRESS SPACE TO ENTER INSTANTLY]
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── PHASE 3: PORTAL BREACH / TRANSITION TO MAIN SCREEN ─────── */}
+          {stage === 'PORTAL_BREACH' && (
+            <motion.div
+              key="portal-breach"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1.15 }}
+              exit={{ opacity: 0, scale: 1.5, filter: "blur(20px)" }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="text-center w-full space-y-3"
+            >
+              <div className="text-sm sm:text-lg font-black text-[#00ff66] tracking-widest text-glow uppercase animate-pulse">
+                DOMAIN ACCESS GRANTED
+              </div>
+              <div className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">
+                ENTERING MAIN SYSTEM...
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* BOTTOM TELEMETRY FOOTER */}
+      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[10px] text-zinc-500 border-t border-[#00ff66]/20 pt-3 z-20 gap-2">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#00ff66] animate-pulse" />
+          <span className="text-zinc-400 uppercase font-bold">
+            STAGE: {stage === 'FLASH_WARNING' ? '00 // FLASH WARNING' : stage === 'WARP_ZOOM' ? '01 // WARPING ZOOM' : stage === 'DOMAIN_REVEAL' ? "02 // PATRICK JOSH'S DOMAIN" : '03 // PORTAL BREACH'}
+          </span>
+        </div>
+
+        <div className="text-zinc-400 font-mono">
+          BUKIDNON STATE UNIVERSITY • PATRICK JOSH AÑEDEZ
+        </div>
+      </footer>
     </motion.div>
   );
 };

@@ -33,107 +33,120 @@ export interface Artwork {
 export const SERVICES_DATA: Service[] = [
   {
     id: 1,
-    tag: "// SERVICE_01 // ACTIVE",
-    title: "Full-stack Web Developer",
-    shortDesc: "End-to-end web deployment, interactive modules, and high-performance server structures.",
-    projectName: "COMSOC_MIS_v1.0",
-    projectDesc: "A secure student organization management portal featuring live biometric dashboard logs, digital roster rosters, security firewall overlays, and high-fidelity custom design systems.",
-    projectLink: "https://github.com/Patkik/SocMed-Bio",
-    projectImage: "/img/art1.jpg"
-  },
-  {
-    id: 2,
-    tag: "// SERVICE_02 // ACTIVE",
-    title: "Graphic Designer",
-    shortDesc: "Sleek visual layouts, modern UI branding elements, and customized digital assets.",
-    projectName: "CATERPRO_BRAND_DECK",
-    projectDesc: "A premium corporate identity design system. Crafted with strict Apple-inspired minimalist design rules, balanced typography ratios, and micro-interaction visual blueprints.",
-    projectLink: "https://github.com/Patkik/SocMed-Bio",
-    projectImage: "/img/art2.jpg"
+    tag: "FEATURED PROJECT • ACTIVE",
+    title: "Full-Stack Web Developer",
+    shortDesc: "BukSU Capstone Management & Archiving System (CMS-V2)",
+    projectName: "BukSU Capstone Management System",
+    projectDesc: "A comprehensive web application built for Bukidnon State University's IT Department to manage undergraduate capstone proposals, faculty review rubrics, clearance workflows, and research paper archiving.",
+    projectLink: "https://github.com/Patkik/Capstone-management-system",
+    projectImage: "/cmsv2-showcase/web/01-hero-control-deck.webp"
   }
 ];
 
 export const TECH_STACKS: TechStack[] = [
-  { name: "HTML", category: "Frontend", level: 95 },
-  { name: "CSS", category: "Frontend", level: 90 },
-  { name: "JavaScript", category: "Frontend", level: 92 },
-  { name: "TypeScript", category: "Frontend", level: 85 },
-  { name: "React", category: "Frontend", level: 88 },
-  { name: "Java", category: "Backend", level: 80 },
-  { name: "MySQL", category: "Database", level: 85 },
-  { name: "MongoDB", category: "Database", level: 78 },
-  { name: "Redis", category: "Database", level: 82 },
-  { name: "Git", category: "Version Control", level: 90 },
+  { name: "React", category: "Frontend", level: 92 },
+  { name: "TypeScript", category: "Frontend", level: 88 },
+  { name: "Express", category: "Backend", level: 90 },
+  { name: "MongoDB", category: "Database", level: 86 },
+  { name: "ChromaDB", category: "Database", level: 82 },
+  { name: "PaddleOCR-VL", category: "Next-Gen", level: 85 },
   { name: "Docker", category: "DevOps", level: 84 },
   { name: "AWS", category: "DevOps", level: 80 },
+  { name: "Redis", category: "Database", level: 82 },
+  { name: "Git", category: "Version Control", level: 90 },
+  { name: "JavaScript", category: "Frontend", level: 94 },
+  { name: "HTML", category: "Frontend", level: 95 },
+  { name: "CSS", category: "Frontend", level: 92 },
+  { name: "Java", category: "Backend", level: 80 },
+  { name: "MySQL", category: "Database", level: 85 },
   { name: "Agentic A.I", category: "Next-Gen", level: 95 }
 ];
 
 export const TECH_DETAILS: Record<string, TechDetail> = {
-  "html": {
-    systemRole: "Markup structural foundation layer.",
-    xp: "Crafting semantically complete Document Object Models with SEO compliance and ARIA access keys.",
-    projects: "Comsoc MIS, CaterPro Brand Landing Page."
-  },
-  "css": {
-    systemRole: "Visual layout styling engine.",
-    xp: "Designing modern fluid grid frameworks, CRT shaders, glassmorphism templates, and adaptive animation curves.",
-    projects: "Holy Portfolio, CaterPro Presentation Deck."
-  },
-  "javascript": {
-    systemRole: "Runtime behavioral engine.",
-    xp: "Asynchronous task orchestration, Web Audio API synthesis, dynamic canvas rendering, and live DOM updates.",
-    projects: "Spaceship Flight HUD, Comsoc member dashboard."
+  "react": {
+    systemRole: "Interactive SPA cockpit & deliberation reader engine.",
+    xp: "Engineered instructor workload matrix, real-time rubric scoring interfaces, student revision queues, and Google Scholar-style archive browser.",
+    projects: "BukSU CMS-V2 Web Cockpit, Deliberation Matrix Deck."
   },
   "typescript": {
-    systemRole: "Compile-time strict typing controller.",
-    xp: "Writing interface contracts, generics, strict null-safe checks, and compiler declarations to prevent system crashes.",
-    projects: "Holy Portfolio main build, SocMed-Bio telemetry data layer."
+    systemRole: "Compile-time strict typing controller & domain contract enforcement.",
+    xp: "Defined strict type schemas for 4-phase institutional clearance gates, student proposal lifecycles, panel voting interfaces, and typed REST DTOs.",
+    projects: "BukSU CMS-V2 Core Type System, Multi-Tier Milestone Contracts."
   },
-  "react": {
-    systemRole: "Reactive state component virtual DOM engine.",
-    xp: "Framer Motion layout animations, component hooks (useState, useEffect, useRef), and lazy rendering optimizations.",
-    projects: "Hacker Dashboard Mainframe, Comsoc portal."
-  },
-  "java": {
-    systemRole: "Back-end business logic processing node.",
-    xp: "Object-oriented service development, relational mapping, secure REST endpoint controllers, and thread execution.",
-    projects: "CaterPro transaction service, Comsoc core audit server."
-  },
-  "mysql": {
-    systemRole: "Relational database structure engine.",
-    xp: "Designing normalized schemas, indexing keys, foreign key constraints, and writing high-speed query updates.",
-    projects: "Comsoc member roster data logs, CaterPro backend storage."
+  "express": {
+    systemRole: "RESTful API gateway & institutional authorization controller.",
+    xp: "Designed modular endpoints, JWT-authenticated sessions, and granular Role-Based Access Control (RBAC) across Students, Advisers, Panelists, Chairs, and Dean ADM.",
+    projects: "BukSU CMS-V2 API Gateway, Defense Coordination Endpoints."
   },
   "mongodb": {
-    systemRole: "NoSQL document database catalog.",
-    xp: "BSON data schema designs, unstructured telemetry document logs, database clustering, and aggregate lookups.",
-    projects: "SocMed-Bio activity metrics, gaming API cache."
+    systemRole: "NoSQL document catalog & ACID transactional state store.",
+    xp: "Architected flexible BSON schemas for capstone manuscripts, deliberation feedback logs, and atomic multi-document sessions preventing sign-off race conditions.",
+    projects: "BukSU CMS-V2 Document Database, Manuscript Archival Registry."
   },
-  "redis": {
-    systemRole: "In-memory key-value caching system.",
-    xp: "Accelerating query speeds by caching API payloads, session tokens, and routing indexes under 5ms.",
-    projects: "Spaceship cockpit metrics, shell history session buffer."
+  "chromadb": {
+    systemRole: "High-dimensional vector database for semantic literature discovery.",
+    xp: "Indexed dense neural vector embeddings of capstone abstracts and methodologies, enabling conceptual search and duplicate topic detection for new proposals.",
+    projects: "BukSU CMS-V2 Semantic Knowledge Vault, Literature Discovery Engine."
   },
-  "git": {
-    systemRole: "Distributed version control system.",
-    xp: "Branching protocols, pull requests, merge conflict resolutions, and CI/CD pipelines deployment integration.",
-    projects: "All projects managed under Github Patkik/SocMed-Bio repo."
+  "paddleocr-vl": {
+    systemRole: "Vision-Language optical character recognition worker.",
+    xp: "Integrated a 0.9B vision-language pipeline to parse student PDF manuscripts, extracting structured tables, system topology blueprints, and raw narrative text.",
+    projects: "BukSU CMS-V2 PDF Ingestion Worker, Automated SDG Classifier."
+  },
+  "paddleocr": {
+    systemRole: "Vision-Language optical character recognition worker.",
+    xp: "Integrated a 0.9B vision-language pipeline to parse student PDF manuscripts, extracting structured tables, system topology blueprints, and raw narrative text.",
+    projects: "BukSU CMS-V2 PDF Ingestion Worker, Automated SDG Classifier."
   },
   "docker": {
-    systemRole: "Container virtualization infrastructure.",
-    xp: "Multi-stage Dockerfile configurations, alpine OS micro-images, and microservice containers networking configurations.",
-    projects: "Warped Portfolio Docker server deployments, AWS container runs."
+    systemRole: "Container virtualization infrastructure & microservice orchestration.",
+    xp: "Configured multi-stage Docker builds isolating the React client, Express API, Python OCR service, and ChromaDB vector store with dedicated networking.",
+    projects: "BukSU CMS-V2 Production Container Cluster, Local Development Stack."
   },
   "aws": {
-    systemRole: "Cloud computing compute cluster host.",
-    xp: "EC2 virtual servers provisioning, security group network configurations, SSH certificate validations, and public domain hosting.",
-    projects: "SocMed-Bio Live Server hosting, active portfolio EC2 nodes."
+    systemRole: "Secure cloud object storage & archival infrastructure.",
+    xp: "Implemented presigned AWS S3 upload pipelines for tamper-proof capstone PDF storage, bucket access policies, and permanent institutional archives.",
+    projects: "BukSU CMS-V2 Manuscript S3 Storage, Archival Vault."
+  },
+  "redis": {
+    systemRole: "In-memory session buffer & query acceleration layer.",
+    xp: "Cached active defense evaluation rubrics, panel consensus locks, and high-frequency vector search queries to maintain sub-5ms response times.",
+    projects: "BukSU CMS-V2 Deliberation Session Buffer, API Rate Limiter."
+  },
+  "git": {
+    systemRole: "Distributed version control & deployment orchestration.",
+    xp: "Maintained modular branch workflows, pull request reviews, defense release tags, and automated continuous integration for university deployment.",
+    projects: "GitHub: Patkik/Capstone-management-system."
+  },
+  "javascript": {
+    systemRole: "Runtime behavioral engine & client event loop.",
+    xp: "Orchestrated asynchronous PDF uploads, canvas telemetry rendering, real-time rubric calculations, and DOM lifecycle optimizations.",
+    projects: "BukSU CMS-V2 Client Runtime, Capstone Matrix Engine."
+  },
+  "html": {
+    systemRole: "Semantic markup foundation & accessibility compliance.",
+    xp: "Crafted WCAG 2.2 AA compliant document structures, accessible rubric form controls, and screen-reader navigable defense matrices.",
+    projects: "BukSU CMS-V2 Accessible Interfaces, Portfolio Shell."
+  },
+  "css": {
+    systemRole: "Tailwind CSS styling engine & HUD visual system.",
+    xp: "Engineered clean developer dark-mode layouts, high-contrast typography, responsive mobile grids, and subtle HUD indicators.",
+    projects: "BukSU CMS-V2 Design System, Terminal Showcase."
+  },
+  "java": {
+    systemRole: "Object-oriented enterprise service & backend foundation.",
+    xp: "Applied enterprise software patterns, relational database design principles, and secure API architecture derived from university coursework.",
+    projects: "BukSU Academic Enterprise Computing, Backend Foundation."
+  },
+  "mysql": {
+    systemRole: "Relational database schema design & institutional benchmarks.",
+    xp: "Designed 3NF normalized institutional records, foreign key constraints, and comparative query benchmarks alongside MongoDB.",
+    projects: "BukSU Capstone Audit Benchmarks, Relational Data Records."
   },
   "agentic a.i": {
-    systemRole: "Next-Gen autonomous workspace assistant.",
-    xp: "Interpreting developer requirements, compiling software assets, deploying servers, and optimizing runtime parameters autonomously.",
-    projects: "Antigravity coding session, adaptive cockpit UI developer partner."
+    systemRole: "Autonomous architectural code partner & full-stack accelerator.",
+    xp: "Utilized agentic pairing to stress-test OCR extraction pipelines, scaffold complex state machines, optimize vector queries, and verify accessibility.",
+    projects: "BukSU CMS-V2 Development Cycle, Antigravity Engineering Workflows."
   }
 };
 

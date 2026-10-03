@@ -5,7 +5,7 @@ import {
   Image as ImageIcon, Github, Instagram, Facebook,
   Linkedin, ExternalLink, Volume2, VolumeX,
   TerminalSquare, Info, Code, FileCode, Coffee,
-  Database, GitBranch, Cloud, Bot, Box, Mail
+  Database, GitBranch, Cloud, Bot, Box, Mail, Server
 } from 'lucide-react';
 
 // Subsystem Components
@@ -13,6 +13,8 @@ import { CockpitLoader } from './components/CockpitLoader';
 import { RobotAssistant } from './components/RobotAssistant';
 import { SpotifyWidget } from './components/SpotifyWidget';
 import { GlitchText } from './components/GlitchText';
+import { CMSV2TerminalShowcase } from './components/CMSV2TerminalShowcase';
+import { CMSV2CaseStudy } from './components/CMSV2CaseStudy';
 
 // Hooks & Portfolio Data Registry
 import { useAudio, setGlobalAudioEnabled, getGlobalAudioEnabled } from './hooks/useAudio';
@@ -47,6 +49,13 @@ const getTechIcon = (name: string) => {
           <Cpu {...iconProps} />
         </motion.div>
       );
+    case 'express':
+    case 'node.js':
+      return (
+        <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
+          <Server {...iconProps} />
+        </motion.div>
+      );
     case 'java':
       return (
         <motion.div animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
@@ -56,6 +65,7 @@ const getTechIcon = (name: string) => {
     case 'mysql':
     case 'mongodb':
     case 'redis':
+    case 'chromadb':
       return (
         <motion.div animate={{ scale: [1, 1.05, 1], filter: ["drop-shadow(0 0 1px rgba(0,255,65,0.2))", "drop-shadow(0 0 4px rgba(0,255,65,0.6))", "drop-shadow(0 0 1px rgba(0,255,65,0.2))"] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}>
           <Database {...iconProps} />
@@ -79,6 +89,8 @@ const getTechIcon = (name: string) => {
           <Cloud {...iconProps} />
         </motion.div>
       );
+    case 'paddleocr-vl':
+    case 'paddleocr':
     case 'agentic a.i':
       return (
         <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
@@ -95,6 +107,7 @@ export default function App() {
   const [audioEnabled, setAudioEnabled] = useState(getGlobalAudioEnabled());
   const [matrixActive, setMatrixActive] = useState(true);
   const [flash, setFlash] = useState(false);
+  const [skippedIntro, setSkippedIntro] = useState(false);
 
   // Decryption Reveal State
   const [revealColor, setRevealColor] = useState(false);
@@ -123,12 +136,18 @@ export default function App() {
   const [selectedTech, setSelectedTech] = useState<TechStack | null>(null);
   const [expandedService, setExpandedService] = useState<number | null>(null);
   const [spotifyOpen, setSpotifyOpen] = useState(false);
+  const [caseStudyOpen, setCaseStudyOpen] = useState(false);
 
   const { initAudio, clickSound, synthBeep, warningSound } = useAudio();
 
-  const handleLoadingComplete = useCallback(() => {
+  const handleLoadingComplete = useCallback((skipFlash = false) => {
     setLoading(false);
-    setFlash(true);
+    if (skipFlash) {
+      setSkippedIntro(true);
+      setFlash(false);
+    } else {
+      setFlash(true);
+    }
   }, []);
 
   const toggleSpotify = useCallback(() => {
@@ -345,9 +364,9 @@ export default function App() {
       {/* 3. Main Dashboard */}
       {!loading && (
         <motion.div
-          initial={{ opacity: 0, scale: 1.12, filter: "blur(12px)" }}
+          initial={skippedIntro ? { opacity: 0 } : { opacity: 0, scale: 1.12, filter: "blur(12px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ duration: 1.4, ease: "easeOut" }}
+          transition={{ duration: skippedIntro ? 0.35 : 1.4, ease: "easeOut" }}
           className="max-w-6xl mx-auto px-4 py-8 space-y-16 relative z-10"
         >
           {/* Header section */}
@@ -447,11 +466,11 @@ export default function App() {
                 </motion.div>
               </div>
 
-              {/* SERVICES CATALOG CARD (Cinematic Apple-style previews) */}
+              {/* SERVICES CATALOG CARD (Cinematic Interactive Showcase) */}
               <div className="cyber-card p-4 sm:p-6 space-y-4 shadow-glow">
                 <div className="flex items-center gap-2 border-b border-matrix/30 pb-3">
                   <Terminal size={18} className="text-matrix-light" />
-                  <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">SERVICES_PROVISIONED</h2>
+                  <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">&gt;_ SERVICES_PROVISIONED</h2>
                 </div>
                 <div className="space-y-3 font-mono">
                   {SERVICES_DATA.map((service) => {
@@ -466,20 +485,20 @@ export default function App() {
                             clickSound();
                             setExpandedService(isExpanded ? null : service.id);
                           }}
-                          className="w-full flex flex-col items-start p-3 hover:bg-matrix-dark/10 text-left transition-colors focus:outline-none"
+                          className="w-full flex flex-col items-start p-3 hover:bg-matrix-dark/10 text-left transition-colors focus:outline-none cursor-pointer group"
                         >
                           <div className="flex justify-between w-full items-center">
-                            <span className="text-matrix-dark text-[9px] uppercase tracking-wider font-bold">
+                            <span className="text-matrix-light/90 text-[9px] uppercase tracking-wider font-bold group-hover:text-matrix-light transition-colors">
                               {service.tag}
                             </span>
-                            <span className="text-matrix text-xs font-bold">
+                            <span className="text-matrix text-xs font-bold border border-matrix/30 px-1.5 py-0.5 rounded bg-black/60 group-hover:border-matrix transition-all">
                               {isExpanded ? "[-]" : "[+]"}
                             </span>
                           </div>
-                          <span className="text-white font-bold text-xs mt-1">
+                          <span className="text-white font-bold text-xs mt-1 group-hover:text-matrix-light transition-colors">
                             {service.title}
                           </span>
-                          <p className="text-[10px] text-matrix/60 mt-1">
+                          <p className="text-[10px] text-zinc-300 mt-1">
                             {service.shortDesc}
                           </p>
                         </button>
@@ -490,39 +509,16 @@ export default function App() {
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.35, ease: "easeInOut" }}
-                              className="border-t border-matrix/10 bg-black/40 px-3 pb-3 overflow-hidden"
+                              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                              className="border-t border-matrix/20 bg-black/70 p-3 sm:p-4 overflow-hidden"
                             >
-                              <div className="mt-3 border border-matrix/25 rounded-md bg-black/80 overflow-hidden relative group hover:border-matrix/40 transition-all shadow-glow">
-                                <div className="h-40 bg-gradient-to-br from-matrix-dark/20 to-black overflow-hidden relative flex items-center justify-center">
-                                  <img 
-                                    src={service.projectImage} 
-                                    alt={service.projectName} 
-                                    className="w-full h-full object-cover opacity-40 group-hover:opacity-75 group-hover:scale-105 transition-transform duration-700 filter grayscale group-hover:grayscale-0" 
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                                  <div className="absolute bottom-3 left-3 right-3">
-                                    <span className="text-[8px] uppercase tracking-widest text-matrix bg-matrix-dark/50 px-1.5 py-0.5 rounded border border-matrix/20 mb-1 inline-block">
-                                      // KEY_DEPLOYMENT
-                                    </span>
-                                    <h4 className="text-white font-black text-xs tracking-wider uppercase">{service.projectName}</h4>
-                                  </div>
-                                </div>
-                                <div className="p-3 space-y-3 font-mono">
-                                  <p className="text-[9px] text-matrix-light/80 leading-relaxed font-sans">
-                                    {service.projectDesc}
-                                  </p>
-                                  <a 
-                                    href={service.projectLink} 
-                                    target="_blank" 
-                                    rel="noreferrer" 
-                                    className="inline-flex items-center justify-center gap-1.5 border border-matrix bg-matrix-dark/20 hover:bg-matrix hover:text-black py-1 px-3 rounded text-[9px] font-black tracking-wider uppercase transition-all shadow-glow w-full text-center"
-                                  >
-                                    <span>DEPLOYED_MAIN_PORTAL</span>
-                                    <ExternalLink size={8} />
-                                  </a>
-                                </div>
-                              </div>
+                              <CMSV2TerminalShowcase
+                                onOpenCaseStudy={() => {
+                                  clickSound();
+                                  setCaseStudyOpen(true);
+                                }}
+                                onSoundTrigger={clickSound}
+                              />
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -981,6 +977,26 @@ export default function App() {
             onAnimationComplete={() => setFlash(false)}
             className="fixed inset-0 z-50 bg-white pointer-events-none"
           />
+        )}
+      </AnimatePresence>
+
+      {/* 6. CINEMATIC BUKSU CMS-V2 CASE STUDY OVERLAY */}
+      <AnimatePresence>
+        {caseStudyOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-50 overflow-y-auto bg-[#090D14]"
+          >
+            <CMSV2CaseStudy
+              onClose={() => {
+                clickSound();
+                setCaseStudyOpen(false);
+              }}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
 

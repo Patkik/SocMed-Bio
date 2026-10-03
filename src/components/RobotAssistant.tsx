@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Terminal } from 'lucide-react';
 import { TechStack, TECH_DETAILS } from '../data/portfolioData';
 import { Typewriter } from './Typewriter';
 import { useAudio } from '../hooks/useAudio';
@@ -145,16 +146,7 @@ export const RobotAssistant: React.FC<RobotAssistantProps> = React.memo(({ selec
           isRobotGlitching ? "bg-red-950/20 border-red-500/30" : "bg-matrix/10 border-matrix/30"
         }`}>
           <div className="flex items-center gap-2 min-w-0 mr-2">
-            <motion.div 
-              animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              className={`font-bold tracking-tighter text-xs whitespace-nowrap shrink-0 ${isRobotGlitching ? "text-red-500" : "text-matrix"}`}
-            >
-              🤖 {robotFace}
-            </motion.div>
+            <Terminal size={13} className={`shrink-0 ${isRobotGlitching ? "text-red-400 animate-pulse" : "text-matrix-light"}`} />
             <span className={`text-[10px] font-bold tracking-widest uppercase transition-colors truncate ${
               isRobotGlitching ? "text-red-400 animate-pulse text-glow-red" : "text-matrix-light"
             }`}>
