@@ -433,7 +433,7 @@ export default function App() {
                   {BIO_OVERVIEW.textPart1}
                   <span onClick={() => { clickSound(); setRevealColor(!revealColor); }} className="cursor-pointer inline-block">
                     {revealColor ? (
-                      <span className="text-red-400 font-bold border-b border-red-500 border-dashed">{BIO_OVERVIEW.favColorRevealed}</span>
+                      <span className="text-blue-400 font-bold border-b border-blue-500 border-dashed">{BIO_OVERVIEW.favColorRevealed}</span>
                     ) : (
                       <GlitchText text={BIO_OVERVIEW.favColorPlaceholder} className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs" />
                     )}
@@ -609,7 +609,7 @@ export default function App() {
                       className="focus:outline-none"
                     >
                       {revealColor ? (
-                        <span className="text-white font-bold text-xs">{SYSTEM_SPECS_DATA.favColorRevealed}</span>
+                        <span className="text-blue-400 font-bold text-xs">{SYSTEM_SPECS_DATA.favColorRevealed}</span>
                       ) : (
                         <GlitchText text={BIO_OVERVIEW.favColorPlaceholder} className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs cursor-pointer" />
                       )}
@@ -633,16 +633,6 @@ export default function App() {
                   <div className="text-xs flex justify-between py-1">
                     <span className="text-matrix/70">GEOLOCATION:</span>
                     <span className="text-white font-bold">{SYSTEM_SPECS_DATA.geolocation}</span>
-                  </div>
-
-                  <div className="text-xs flex justify-between py-1">
-                    <span className="text-matrix/70">MOOD:</span>
-                    <span className="text-white font-bold">{SYSTEM_SPECS_DATA.mood}</span>
-                  </div>
-
-                  <div className="text-xs flex justify-between py-1">
-                    <span className="text-matrix/70">ENERGY_SRC:</span>
-                    <span className="text-matrix-light text-glow font-bold">{SYSTEM_SPECS_DATA.energySrc}</span>
                   </div>
                 </div>
               </div>

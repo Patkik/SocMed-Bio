@@ -183,8 +183,6 @@ export interface SystemSpecs {
   favColorRevealed: string;
   birthdayRevealed: string;
   geolocation: string;
-  mood: string;
-  energySrc: string;
 }
 
 export interface ExtraFacts {
@@ -221,19 +219,17 @@ export interface GenshinData {
 export const BIO_OVERVIEW: BioOverview = {
   textPart1: "Currently a BSIT student, night owl, chill, likes animals, likes anime, likes coding, fav color ",
   favColorPlaceholder: "[REDACTED]",
-  favColorRevealed: "NASA COMMENT SECTION",
+  favColorRevealed: "Blue",
   birthdayPlaceholder: "[REDACTED]",
-  birthdayRevealed: "NASA COMMENT SECTION",
+  birthdayRevealed: "Sept 19, 2004",
   textPart2: ", birthday ",
   threatQuote: "My dream is to be a dinosaur someday so I can eat every single person that hurts my feelings."
 };
 
 export const SYSTEM_SPECS_DATA: SystemSpecs = {
-  favColorRevealed: "GREEN",
-  birthdayRevealed: "OCTOBER 9, 2004",
-  geolocation: "PH_CORE.SYS",
-  mood: "CHILL_STATE",
-  energySrc: "COFFEE_AND_ANIME"
+  favColorRevealed: "BLUE",
+  birthdayRevealed: "SEPTEMBER 19, 2004",
+  geolocation: "PH_CORE.SYS"
 };
 
 export const EXTRA_FACTS_DATA: ExtraFacts = {
