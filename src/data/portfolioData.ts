@@ -144,9 +144,9 @@ export const TECH_DETAILS: Record<string, TechDetail> = {
     projects: "BukSU Capstone Audit Benchmarks, Relational Data Records."
   },
   "agentic a.i": {
-    systemRole: "Autonomous architectural code partner & full-stack accelerator.",
-    xp: "Utilized agentic pairing to stress-test OCR extraction pipelines, scaffold complex state machines, optimize vector queries, and verify accessibility.",
-    projects: "BukSU CMS-V2 Development Cycle, Antigravity Engineering Workflows."
+    systemRole: "AI-Accelerated Engineering & Rapid Scaffolding.",
+    xp: "Power-user of modern AI tooling (Cursor, Claude Code) to rapidly scaffold, rigorously test, and ship maintainable software in a fraction of traditional dev cycles.",
+    projects: "BukSU CMS-V2 Architecture, Continuous Refactoring Engine."
   }
 };
 
@@ -169,11 +169,27 @@ export const ARTWORKS_DATA: Artwork[] = [
   }
 ];
 
+export interface Competency {
+  title: string;
+  description: string;
+  tag: string;
+}
+
+export interface Deliverable {
+  title: string;
+  description: string;
+}
+
 export interface BioOverview {
-  headline: string;
+  name: string;
+  role: string;
   institution: string;
-  summary: string;
-  subSummary: string;
+  location: string;
+  email: string;
+  github: string;
+  aboutMe: string;
+  competencies: Competency[];
+  deliverables: Deliverable[];
   textPart1: string;
   favColorPlaceholder: string;
   favColorRevealed: string;
@@ -226,10 +242,54 @@ export interface GenshinData {
 }
 
 export const BIO_OVERVIEW: BioOverview = {
-  headline: "BSIT // Web Systems, Process Automation & Applied AI",
-  institution: "Bukidnon State University",
-  summary: "Information Technology student at Bukidnon State University specializing in full-stack web platforms, workflow automation, and applied AI.",
-  subSummary: "I engineer web systems that replace manual, paper-based bottlenecks and messy spreadsheets with sleek, automated tools (such as BukSU CMS-V2). Powered by modern AI-assisted developer workflows to rapidly prototype, test, and ship clean software—backed by a multidisciplinary creative background in digital video and physical branding.",
+  name: "Patrick Josh Añedez",
+  role: "Full-Stack Developer & Automation Builder",
+  institution: "Bukidnon State University — BS Information Technology",
+  location: "Malaybalay City, Bukidnon",
+  email: "patrickjoshanedez35@gmail.com",
+  github: "github.com/Patkik",
+  aboutMe: "I’m a BSIT student and builder at Bukidnon State University. I specialize in turning slow, paper-heavy workflows into fast, automated web systems people actually enjoy using. As the lead developer behind BukSU CMS-V2, I take pride in owning products end-to-end—from database schemas to polished user interfaces. I combine modern AI-assisted workflows to iterate rapidly with a multidisciplinary background in digital video and print branding.",
+  competencies: [
+    {
+      title: "Full-Stack Web Development",
+      description: "Building responsive web applications, secure REST APIs, and admin cockpits using React, TypeScript, Express, Node.js, and MongoDB/SQL.",
+      tag: "FULL_STACK"
+    },
+    {
+      title: "Process Automation & System Digitization",
+      description: "Eliminating manual paperwork, lost PDFs, and spreadsheet bottlenecks by engineering structured digital pipelines (e.g. multi-tier institutional clearance systems).",
+      tag: "AUTOMATION"
+    },
+    {
+      title: "Applied AI & Intelligent Features",
+      description: "Integrating smart search (vector databases like ChromaDB), automated PDF/OCR text extraction (PaddleOCR), and LLM-assisted workflows directly into web apps.",
+      tag: "APPLIED_AI"
+    },
+    {
+      title: "AI-Accelerated Engineering",
+      description: "Power-user of modern AI tooling (Cursor, Claude Code) to rapidly scaffold, rigorously test, and ship maintainable software in a fraction of traditional dev cycles.",
+      tag: "AI_HARNESS"
+    },
+    {
+      title: "Creative Media & Physical Branding",
+      description: "Crafting vector graphics for vinyl cutting (vehicle decals, physical signage) alongside digital video editing and visual design.",
+      tag: "CREATIVE_MEDIA"
+    }
+  ],
+  deliverables: [
+    {
+      title: "Centralized Web Platforms",
+      description: "Custom portals that unify fragmented operations into real-time dashboards."
+    },
+    {
+      title: "Smart Search & Archiving",
+      description: "High-speed document repositories with semantic search and metadata filters."
+    },
+    {
+      title: "Cross-Disciplinary Production",
+      description: "Bridging code and visual media to support engineering teams end-to-end."
+    }
+  ],
   textPart1: "Night owl • Anime fan • Gamer • Fav color ",
   favColorPlaceholder: "[REDACTED]",
   favColorRevealed: "Blue",

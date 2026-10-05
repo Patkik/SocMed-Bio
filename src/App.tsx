@@ -378,10 +378,25 @@ export default function App() {
               >
                 PATRICK JOSH <span className="text-white group-hover:text-matrix transition-colors">AÑEDEZ</span>
               </h1>
-              <p className="text-xs text-matrix/60 mt-1 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-matrix rounded-full animate-ping" />
-                WELCOME TO MY HUMBLE ABODE, VISITOR!
-              </p>
+              <div className="mt-2 space-y-1 font-mono">
+                <p className="text-xs sm:text-sm text-white font-bold tracking-wide flex flex-wrap items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-matrix rounded-full animate-ping" />
+                  <span className="text-matrix-light">{BIO_OVERVIEW.role}</span>
+                  <span className="text-matrix/40 hidden xs:inline">•</span>
+                  <span className="text-matrix/80 font-normal text-xs">{BIO_OVERVIEW.institution}</span>
+                </p>
+                <p className="text-[11px] text-matrix/70 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span>📍 {BIO_OVERVIEW.location}</span>
+                  <span className="text-matrix/40">•</span>
+                  <a href={`mailto:${BIO_OVERVIEW.email}`} className="hover:text-matrix-light underline transition-colors">
+                    ✉ {BIO_OVERVIEW.email}
+                  </a>
+                  <span className="text-matrix/40">•</span>
+                  <a href={`https://${BIO_OVERVIEW.github}`} target="_blank" rel="noopener noreferrer" className="hover:text-matrix-light underline transition-colors">
+                    🌐 {BIO_OVERVIEW.github}
+                  </a>
+                </p>
+              </div>
             </div>
 
             {/* Header controls */}
@@ -424,25 +439,74 @@ export default function App() {
             <div className="space-y-8">
               
               {/* SYSTEM BIO OVERVIEW */}
-              <div className="cyber-card p-4 sm:p-6 space-y-5 shadow-glow">
+              <div className="cyber-card p-4 sm:p-6 space-y-6 shadow-glow">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-matrix/30 pb-3">
                   <div className="flex items-center gap-2">
                     <Terminal size={18} className="text-matrix-light" />
                     <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">BIO_OVERVIEW</h2>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-matrix/30 bg-matrix-dark/20 text-matrix-light tracking-wider uppercase self-start sm:self-auto">
-                    {BIO_OVERVIEW.headline}
+                    OPERATOR_DOSSIER // ACTIVE
                   </span>
                 </div>
 
-                {/* Professional Bio Statement */}
-                <div className="space-y-2.5 text-xs sm:text-sm text-white/90 leading-relaxed font-mono">
-                  <p>
-                    {BIO_OVERVIEW.summary}
+                {/* About Me Section */}
+                <div className="space-y-2">
+                  <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-1 uppercase font-bold tracking-wider flex items-center gap-1.5 font-mono">
+                    <span className="text-matrix">┌──</span> ABOUT_ME
+                  </div>
+                  <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-mono">
+                    {BIO_OVERVIEW.aboutMe}
                   </p>
-                  <p className="text-white/80 text-xs leading-relaxed">
-                    {BIO_OVERVIEW.subSummary}
-                  </p>
+                </div>
+
+                {/* Core Competencies Section */}
+                <div className="space-y-2.5">
+                  <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-1 uppercase font-bold tracking-wider flex items-center gap-1.5 font-mono">
+                    <span className="text-matrix">┌──</span> CORE_COMPETENCIES
+                  </div>
+                  <div className="space-y-2 font-mono">
+                    {BIO_OVERVIEW.competencies.map((comp, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded bg-matrix-dark/10 border border-matrix/20 hover:border-matrix/50 transition-colors space-y-1"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-bold text-matrix-light flex items-center gap-1.5">
+                            <span className="text-matrix">•</span> {comp.title}
+                          </span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-matrix-dark/30 border border-matrix/20 text-matrix/70 font-mono tracking-wider shrink-0">
+                            {comp.tag}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-white/80 leading-relaxed pl-3 border-l border-matrix/20">
+                          {comp.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* What I Build & Deliver Section */}
+                <div className="space-y-2.5">
+                  <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-1 uppercase font-bold tracking-wider flex items-center gap-1.5 font-mono">
+                    <span className="text-matrix">┌──</span> WHAT_I_BUILD_AND_DELIVER
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 font-mono">
+                    {BIO_OVERVIEW.deliverables.map((del, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 rounded bg-matrix-dark/10 border border-matrix/20 hover:border-matrix/40 transition-colors"
+                      >
+                        <div className="text-xs font-bold text-white mb-0.5 flex items-center gap-1.5">
+                          <span className="text-matrix">•</span> {del.title}
+                        </div>
+                        <div className="text-[11px] text-matrix/80 leading-relaxed pl-3 border-l border-matrix/20">
+                          {del.description}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Interactive Intel / Easter Eggs */}
