@@ -170,6 +170,10 @@ export const ARTWORKS_DATA: Artwork[] = [
 ];
 
 export interface BioOverview {
+  headline: string;
+  institution: string;
+  summary: string;
+  subSummary: string;
   textPart1: string;
   favColorPlaceholder: string;
   favColorRevealed: string;
@@ -222,12 +226,16 @@ export interface GenshinData {
 }
 
 export const BIO_OVERVIEW: BioOverview = {
-  textPart1: "Currently a BSIT student, night owl, chill, likes animals, likes anime, likes coding, fav color ",
+  headline: "BSIT // Web Systems, Process Automation & Applied AI",
+  institution: "Bukidnon State University",
+  summary: "Information Technology student at Bukidnon State University specializing in full-stack web platforms, workflow automation, and applied AI.",
+  subSummary: "I engineer web systems that replace manual, paper-based bottlenecks and messy spreadsheets with sleek, automated tools (such as BukSU CMS-V2). Powered by modern AI-assisted developer workflows to rapidly prototype, test, and ship clean software—backed by a multidisciplinary creative background in digital video and physical branding.",
+  textPart1: "Night owl • Anime fan • Gamer • Fav color ",
   favColorPlaceholder: "[REDACTED]",
   favColorRevealed: "Blue",
+  textPart2: " • Birthday ",
   birthdayPlaceholder: "[REDACTED]",
   birthdayRevealed: "Sept 19, 2004",
-  textPart2: ", birthday ",
   quote: {
     text: "Learning is a daily experience and a lifetime mission. I truly believe in the saying",
     highlight: "We work to become, not to acquire.",

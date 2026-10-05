@@ -424,13 +424,34 @@ export default function App() {
             <div className="space-y-8">
               
               {/* SYSTEM BIO OVERVIEW */}
-              <div className="cyber-card p-4 sm:p-6 space-y-6 shadow-glow">
-                <div className="flex items-center gap-2 border-b border-matrix/30 pb-3">
-                  <Terminal size={18} className="text-matrix-light" />
-                  <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">BIO_OVERVIEW</h2>
+              <div className="cyber-card p-4 sm:p-6 space-y-5 shadow-glow">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-matrix/30 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Terminal size={18} className="text-matrix-light" />
+                    <h2 className="text-sm font-bold tracking-widest text-matrix-light uppercase">BIO_OVERVIEW</h2>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-matrix/30 bg-matrix-dark/20 text-matrix-light tracking-wider uppercase self-start sm:self-auto">
+                    {BIO_OVERVIEW.headline}
+                  </span>
                 </div>
-                <p className="text-sm text-white/90 leading-relaxed font-mono">
-                  {BIO_OVERVIEW.textPart1}
+
+                {/* Professional Bio Statement */}
+                <div className="space-y-2.5 text-xs sm:text-sm text-white/90 leading-relaxed font-mono">
+                  <p>
+                    {BIO_OVERVIEW.summary}
+                  </p>
+                  <p className="text-white/80 text-xs leading-relaxed">
+                    {BIO_OVERVIEW.subSummary}
+                  </p>
+                </div>
+
+                {/* Interactive Intel / Easter Eggs */}
+                <div className="p-3 rounded border border-matrix/20 bg-matrix-dark/15 font-mono text-xs text-matrix/80 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                  <span className="text-matrix-light font-bold text-[10px] tracking-wider uppercase mr-1 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-matrix animate-ping" />
+                    &gt;_ INTEL_LOCKS:
+                  </span>
+                  <span>{BIO_OVERVIEW.textPart1}</span>
                   <span onClick={() => { clickSound(); setRevealColor(!revealColor); }} className="cursor-pointer inline-block">
                     {revealColor ? (
                       <span className="text-blue-400 font-bold border-b border-blue-500 border-dashed">{BIO_OVERVIEW.favColorRevealed}</span>
@@ -438,7 +459,7 @@ export default function App() {
                       <GlitchText text={BIO_OVERVIEW.favColorPlaceholder} className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs" />
                     )}
                   </span>
-                  {BIO_OVERVIEW.textPart2}
+                  <span>{BIO_OVERVIEW.textPart2}</span>
                   <span onClick={() => { clickSound(); setRevealBirthday(!revealBirthday); }} className="cursor-pointer inline-block">
                     {revealBirthday ? (
                       <span className="text-matrix-light font-bold border-b border-matrix border-dashed">{BIO_OVERVIEW.birthdayRevealed}</span>
@@ -446,8 +467,8 @@ export default function App() {
                       <GlitchText text={BIO_OVERVIEW.birthdayPlaceholder} className="text-matrix-light bg-matrix-dark/30 px-1 border border-matrix/30 text-xs" />
                     )}
                   </span>
-                  , likes to play games.
-                </p>
+                  <span> • Likes animals & coding.</span>
+                </div>
 
                 {/* STYLISH QUOTE CARD // CORE MANTRA */}
                 <motion.div
