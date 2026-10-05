@@ -176,7 +176,12 @@ export interface BioOverview {
   birthdayPlaceholder: string;
   birthdayRevealed: string;
   textPart2: string;
-  threatQuote: string;
+  threatQuote?: string;
+  quote: {
+    text: string;
+    highlight: string;
+    author: string;
+  };
 }
 
 export interface SystemSpecs {
@@ -223,7 +228,11 @@ export const BIO_OVERVIEW: BioOverview = {
   birthdayPlaceholder: "[REDACTED]",
   birthdayRevealed: "Sept 19, 2004",
   textPart2: ", birthday ",
-  threatQuote: "My dream is to be a dinosaur someday so I can eat every single person that hurts my feelings."
+  quote: {
+    text: "Learning is a daily experience and a lifetime mission. I truly believe in the saying",
+    highlight: "We work to become, not to acquire.",
+    author: "Bill Russell"
+  }
 };
 
 export const SYSTEM_SPECS_DATA: SystemSpecs = {

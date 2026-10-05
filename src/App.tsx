@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Terminal, ShieldAlert, Cpu, Share2,
+  Terminal, Quote, Sparkles, Cpu, Share2,
   Image as ImageIcon, Github, Instagram, Facebook,
   Linkedin, ExternalLink, Volume2, VolumeX,
   TerminalSquare, Info, Code, FileCode, Coffee,
@@ -449,20 +449,49 @@ export default function App() {
                   , likes to play games.
                 </p>
 
-                {/* Cyber dinosaur threat banner */}
+                {/* STYLISH QUOTE CARD // CORE MANTRA */}
                 <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-red-950/20 border border-red-500/40 p-4 rounded relative overflow-hidden group shadow-glow-red"
+                  whileHover={{ scale: 1.015 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative overflow-hidden rounded-lg border border-matrix/30 bg-gradient-to-br from-matrix-dark/25 via-[#030804]/90 to-black p-4 sm:p-5 shadow-glow group hover:border-matrix/60 transition-colors"
                 >
-                  <div className="absolute top-0 right-0 px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold tracking-widest border-l border-b border-red-500/40 uppercase">
-                    SYS_THREAT
+                  {/* Top-right terminal status badge */}
+                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-matrix/15 text-matrix-light text-[9px] font-mono font-bold tracking-widest border-l border-b border-matrix/30 uppercase flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-matrix animate-pulse" />
+                    CORE_MANTRA
                   </div>
-                  <h4 className="text-red-400 font-bold mb-2 flex items-center gap-2 text-xs text-glow-red uppercase">
-                    <ShieldAlert size={14} className="animate-pulse" /> TARGET_CLASSIFICATION.LOG
-                  </h4>
-                  <p className="text-xs text-red-200/90 italic font-mono leading-relaxed">
-                    "{BIO_OVERVIEW.threatQuote}"
-                  </p>
+
+                  {/* Watermark quote symbol */}
+                  <Quote
+                    size={68}
+                    className="absolute -right-2 -bottom-2 text-matrix/[0.07] -rotate-12 pointer-events-none select-none transition-transform duration-500 group-hover:scale-110 group-hover:text-matrix/[0.12]"
+                  />
+
+                  {/* Header label */}
+                  <div className="flex items-center gap-2 text-matrix-light text-xs font-bold tracking-wider uppercase mb-2.5">
+                    <Sparkles size={14} className="text-matrix animate-pulse" />
+                    <span>LIFETIME_MISSION // PHILOSOPHY</span>
+                  </div>
+
+                  {/* Quote content */}
+                  <blockquote className="relative z-10 space-y-3 font-mono">
+                    <p className="text-xs sm:text-sm text-white/90 leading-relaxed italic">
+                      "{BIO_OVERVIEW.quote.text}{' '}
+                      <span className="text-matrix-light font-bold not-italic text-glow underline decoration-matrix/40 decoration-wavy underline-offset-4">
+                        '{BIO_OVERVIEW.quote.highlight}'
+                      </span>
+                      "
+                    </p>
+
+                    <div className="pt-2 flex items-center justify-between text-[11px] border-t border-matrix/20 text-matrix/70">
+                      <span className="tracking-widest uppercase font-semibold flex items-center gap-1.5 text-matrix-light">
+                        <span className="text-matrix">──</span> {BIO_OVERVIEW.quote.author}
+                      </span>
+                      <span className="text-[10px] text-matrix-dark tracking-wider uppercase hidden xs:inline">
+                        // GUIDING_DIRECTIVE
+                      </span>
+                    </div>
+                  </blockquote>
                 </motion.div>
               </div>
 
