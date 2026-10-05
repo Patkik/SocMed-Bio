@@ -460,10 +460,10 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Core Competencies Section */}
+                {/* Core Highlights Section */}
                 <div className="space-y-2.5">
                   <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-1 uppercase font-bold tracking-wider flex items-center gap-1.5 font-mono">
-                    <span className="text-matrix">┌──</span> CORE_COMPETENCIES
+                    <span className="text-matrix">┌──</span> CORE_HIGHLIGHTS
                   </div>
                   <div className="space-y-2 font-mono">
                     {BIO_OVERVIEW.competencies.map((comp, idx) => (

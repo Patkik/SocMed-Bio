@@ -244,35 +244,35 @@ export interface GenshinData {
 export const BIO_OVERVIEW: BioOverview = {
   name: "Patrick Josh Añedez",
   role: "Full-Stack Developer & Automation Builder",
-  institution: "Bukidnon State University — BS Information Technology",
-  location: "Malaybalay City, Bukidnon",
+  institution: "BS Information Technology",
+  location: "Malaybalay City, PH",
   email: "patrickjoshanedez35@gmail.com",
   github: "github.com/Patkik",
-  aboutMe: "I’m a BSIT student and builder at Bukidnon State University. I specialize in turning slow, paper-heavy workflows into fast, automated web systems people actually enjoy using. As the lead developer behind BukSU CMS-V2, I take pride in owning products end-to-end—from database schemas to polished user interfaces. I combine modern AI-assisted workflows to iterate rapidly with a multidisciplinary background in digital video and print branding.",
+  aboutMe: "I’m an IT student at BukSU and a builder at heart. I build software because I love solving real-world friction—turning slow, paper-heavy workflows and messy spreadsheets into fast, automated web systems that people actually enjoy using. As the lead developer behind CMS-V2, I take pride in owning products end-to-end: architecting database schemas, crafting secure APIs, and polishing responsive interfaces. To move fast without sacrificing quality, I pair deeply with modern AI developer tooling, backed by a multidisciplinary creative background in digital video and physical branding.",
   competencies: [
     {
-      title: "Full-Stack Web Development",
-      description: "Building responsive web applications, secure REST APIs, and admin cockpits using React, TypeScript, Express, Node.js, and MongoDB/SQL.",
+      title: "Full-Stack Web Systems",
+      description: "Building responsive web applications, secure REST APIs, and administrative cockpits using React, TypeScript, Express, Node.js, and MongoDB/SQL.",
       tag: "FULL_STACK"
     },
     {
-      title: "Process Automation & System Digitization",
-      description: "Eliminating manual paperwork, lost PDFs, and spreadsheet bottlenecks by engineering structured digital pipelines (e.g. multi-tier institutional clearance systems).",
+      title: "Workflow Automation & Digitization",
+      description: "Eliminating manual paperwork, lost PDFs, and spreadsheet bottlenecks by engineering structured, multi-tier digital approval pipelines (e.g. CMS-V2).",
       tag: "AUTOMATION"
     },
     {
-      title: "Applied AI & Intelligent Features",
-      description: "Integrating smart search (vector databases like ChromaDB), automated PDF/OCR text extraction (PaddleOCR), and LLM-assisted workflows directly into web apps.",
+      title: "AI-Accelerated Development",
+      description: "Power-user of modern AI tooling (Cursor, Claude Code) to rapidly scaffold, rigorously test, and ship clean software in record time.",
+      tag: "AI_WORKFLOWS"
+    },
+    {
+      title: "Applied AI & Smart Search",
+      description: "Integrating neural vector search (ChromaDB), automated document OCR extraction (PaddleOCR), and LLM pipelines directly into web apps.",
       tag: "APPLIED_AI"
     },
     {
-      title: "AI-Accelerated Engineering",
-      description: "Power-user of modern AI tooling (Cursor, Claude Code) to rapidly scaffold, rigorously test, and ship maintainable software in a fraction of traditional dev cycles.",
-      tag: "AI_HARNESS"
-    },
-    {
       title: "Creative Media & Physical Branding",
-      description: "Crafting vector graphics for vinyl cutting (vehicle decals, physical signage) alongside digital video editing and visual design.",
+      description: "Crafting precision vector graphics for vinyl cutting (vehicle decals, physical signage) alongside digital video post-production.",
       tag: "CREATIVE_MEDIA"
     }
   ],
