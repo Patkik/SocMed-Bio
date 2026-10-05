@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Terminal, Quote, Sparkles, Cpu, Share2,
+  Terminal, Quote, Sparkles, Cpu,
   Image as ImageIcon, Github, Instagram, Facebook,
-  Linkedin, ExternalLink, Volume2, VolumeX,
+  Linkedin, Volume2, VolumeX,
   TerminalSquare, Info, Code, FileCode, Coffee,
-  Database, GitBranch, Cloud, Bot, Box, Mail, Server
+  Database, GitBranch, Cloud, Bot, Box, Mail, Server,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 // Subsystem Components
@@ -122,8 +123,9 @@ export default function App() {
     ""
   ]);
 
-  // Tech stack filtering
+  // Tech stack filtering & carousel
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [techCarouselIndex, setTechCarouselIndex] = useState(0);
 
   // Time ticker
   const [systemTime, setSystemTime] = useState('');
@@ -334,10 +336,27 @@ export default function App() {
     setCliInput('');
   };
 
-  // Filter skills
+  // Filter skills & carousel metrics
   const filteredSkills = selectedCategory === 'All'
     ? TECH_STACKS
     : TECH_STACKS.filter(s => s.category === selectedCategory);
+
+  const itemsPerPage = 4;
+  const totalTechPages = Math.max(1, Math.ceil(filteredSkills.length / itemsPerPage));
+  const currentSkills = filteredSkills.slice(
+    techCarouselIndex * itemsPerPage,
+    (techCarouselIndex + 1) * itemsPerPage
+  );
+
+  const handlePrevTech = () => {
+    clickSound();
+    setTechCarouselIndex(prev => (prev > 0 ? prev - 1 : totalTechPages - 1));
+  };
+
+  const handleNextTech = () => {
+    clickSound();
+    setTechCarouselIndex(prev => (prev < totalTechPages - 1 ? prev + 1 : 0));
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-matrix font-mono selection:bg-matrix selection:text-black relative crt-scanlines overflow-x-hidden">
@@ -432,11 +451,8 @@ export default function App() {
             </div>
           </header>
 
-          {/* DE-CLUTTERED 2-COLUMN LAYOUT GRID */}
-          <main className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            
-            {/* COLUMN 1: Bio, Services, CLI Console, and Spec Locks */}
-            <div className="space-y-8">
+          {/* SINGLE-COLUMN STREAMLINED LAYOUT */}
+          <main className="space-y-8 sm:space-y-10 max-w-5xl mx-auto">
               
               {/* SYSTEM BIO OVERVIEW */}
               <div className="cyber-card p-4 sm:p-6 space-y-6 shadow-glow">
@@ -653,179 +669,141 @@ export default function App() {
                 </div>
               </div>
 
-              {/* SYSTEM INTERACTIVE CLI DRAW CONSOLE */}
-              <section className="cyber-card shadow-glow overflow-hidden">
-                <button
-                  onClick={() => {
-                    clickSound();
-                    setCliOpen(!cliOpen);
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-matrix-dark/10 hover:bg-matrix-dark/20 text-xs font-bold font-mono tracking-widest text-matrix-light border-b border-matrix/20"
-                >
-                  <div className="flex items-center gap-2">
-                    <TerminalSquare size={16} className={cliOpen ? "animate-pulse" : ""} />
-                    <span>INTERACTIVE_SYSTEM_SHELL</span>
-                  </div>
-                  <span className="text-[10px] px-2 py-0.5 border border-matrix/30 rounded bg-black">
-                    {cliOpen ? "COLLAPSE_TERM" : "OPEN_TERM"}
-                  </span>
-                </button>
-
-                <AnimatePresence>
-                  {cliOpen && (
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: "auto" }}
-                      exit={{ height: 0 }}
-                      className="bg-black/95 p-4 space-y-4"
-                    >
-                      <div className="h-44 overflow-y-auto font-mono text-xs text-matrix/90 space-y-1 bg-[#020202] p-3 border border-matrix-dark/40 rounded scrollbar-thin">
-                        {cliHistory.map((line, idx) => (
-                          <p key={idx} className="whitespace-pre-wrap">{line}</p>
-                        ))}
-                        <div className="flex items-center text-matrix-light mt-1">
-                          <span className="mr-2 text-matrix-dark font-bold">&gt;</span>
-                          <form
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              executeCommand(cliInput);
-                            }}
-                            className="flex-grow flex items-center"
-                          >
-                            <input
-                              type="text"
-                              value={cliInput}
-                              onChange={(e) => setCliInput(e.target.value)}
-                              className="bg-transparent border-none outline-none text-matrix-light flex-grow font-mono focus:ring-0 focus:border-none p-0 text-xs"
-                              placeholder="Type 'help' and press Enter..."
-                              autoFocus
-                            />
-                          </form>
-                        </div>
-                      </div>
-                      <div className="text-[9px] text-matrix-dark flex justify-between font-mono">
-                        <span>SECURITY_CLEARANCE: OPERATOR</span>
-                        <span>SHELL_VERSION: v2.0.4</span>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </section>
-
-              {/* CLASSIFIED VARIABLES WITH DECRYPTION LOCKS */}
-              <div className="cyber-card p-4 sm:p-6 space-y-4 shadow-glow font-mono">
-                <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-2 uppercase font-bold tracking-wider">SYSTEM_SPECS // REVEAL_LOCKS</div>
-                <div className="space-y-3">
-                  <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
-                    <span className="text-matrix/70 text-xs">FAV_COLOR:</span>
-                    <button
-                      onClick={() => { clickSound(); setRevealColor(!revealColor); }}
-                      className="focus:outline-none"
-                    >
-                      {revealColor ? (
-                        <span className="text-blue-400 font-bold text-xs">{SYSTEM_SPECS_DATA.favColorRevealed}</span>
-                      ) : (
-                        <GlitchText text={BIO_OVERVIEW.favColorPlaceholder} className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs cursor-pointer" />
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
-                    <span className="text-matrix/70 text-xs">BIRTHDAY:</span>
-                    <button
-                      onClick={() => { clickSound(); setRevealBirthday(!revealBirthday); }}
-                      className="focus:outline-none"
-                    >
-                      {revealBirthday ? (
-                        <span className="text-white font-bold text-xs">{SYSTEM_SPECS_DATA.birthdayRevealed}</span>
-                      ) : (
-                        <GlitchText text={BIO_OVERVIEW.birthdayPlaceholder} className="text-matrix-light bg-matrix-dark/30 px-1 border border-matrix/30 text-xs cursor-pointer" />
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="text-xs flex justify-between py-1">
-                    <span className="text-matrix/70">GEOLOCATION:</span>
-                    <span className="text-white font-bold">{SYSTEM_SPECS_DATA.geolocation}</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* COLUMN 2: Tech infrastructure, Artwork vault, gaming decks */}
-            <div className="space-y-8">
-              
-              {/* ANIMATED TECH INFRASTRUCTURE GRID */}
-              <section className="cyber-card p-4 sm:p-6 space-y-6 shadow-glow">
-                <div className="flex flex-col gap-3 pb-4 border-b border-matrix/30">
+              {/* TECH INFRASTRUCTURE // CAROUSEL DECK */}
+              <section className="cyber-card p-4 sm:p-6 space-y-5 shadow-glow">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-matrix/30">
                   <div className="flex items-center gap-2">
                     <Cpu size={20} className="text-matrix-light animate-spin" style={{ animationDuration: '6s' }} />
-                    <h2 className="text-lg font-bold tracking-widest text-matrix-light uppercase">TECH_INFRASTRUCTURE</h2>
+                    <h2 className="text-base sm:text-lg font-bold tracking-widest text-matrix-light uppercase">
+                      TECH_INFRASTRUCTURE // CAROUSEL_DECK
+                    </h2>
                   </div>
 
-                  {/* Filter chips */}
-                  <div className="flex flex-wrap gap-2">
-                    {['All', 'Frontend', 'Backend', 'Database', 'Version Control', 'DevOps', 'Next-Gen'].map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => {
-                          clickSound();
-                          setSelectedCategory(cat);
-                        }}
-                        className={`px-2 py-1 text-[10px] border rounded transition-all font-bold ${
-                          selectedCategory === cat
-                            ? 'border-matrix bg-matrix/20 text-matrix-light text-glow'
-                            : 'border-matrix/20 text-matrix/50 hover:border-matrix/40 hover:text-matrix'
-                        }`}
-                      >
-                        {cat.toUpperCase()}
-                      </button>
-                    ))}
+                  {/* Carousel Controls */}
+                  <div className="flex items-center gap-2 self-start sm:self-auto font-mono text-xs">
+                    <span className="text-[10px] text-matrix/70 px-2 py-0.5 rounded border border-matrix/20 bg-black/60 tracking-wider">
+                      PAGE [ {techCarouselIndex + 1} / {totalTechPages} ]
+                    </span>
+                    <button
+                      onClick={handlePrevTech}
+                      className="p-1 rounded border border-matrix/30 bg-matrix-dark/20 hover:bg-matrix/20 hover:border-matrix text-matrix-light transition-all cursor-pointer"
+                      aria-label="Previous tech page"
+                      title="Previous tech page"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button
+                      onClick={handleNextTech}
+                      className="p-1 rounded border border-matrix/30 bg-matrix-dark/20 hover:bg-matrix/20 hover:border-matrix text-matrix-light transition-all cursor-pointer"
+                      aria-label="Next tech page"
+                      title="Next tech page"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <AnimatePresence mode="popLayout">
-                    {filteredSkills.map((stack, idx) => (
-                      <motion.div
-                        layout
-                        key={stack.name}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        whileHover={{
-                          y: -4,
-                          borderColor: '#00ff66',
-                          boxShadow: "0px 0px 15px rgba(0,255,65,0.3)"
-                        }}
+                {/* Filter chips */}
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {['All', 'Frontend', 'Backend', 'Database', 'Version Control', 'DevOps', 'Next-Gen'].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        clickSound();
+                        setSelectedCategory(cat);
+                        setTechCarouselIndex(0);
+                      }}
+                      className={`px-2 py-1 text-[10px] border rounded transition-all font-bold cursor-pointer ${
+                        selectedCategory === cat
+                          ? 'border-matrix bg-matrix/20 text-matrix-light text-glow'
+                          : 'border-matrix/20 text-matrix/50 hover:border-matrix/40 hover:text-matrix'
+                      }`}
+                    >
+                      {cat.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Carousel Cards Grid */}
+                <div className="overflow-hidden min-h-[135px]">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${selectedCategory}-${techCarouselIndex}`}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.25 }}
+                      className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
+                    >
+                      {currentSkills.map((stack, idx) => (
+                        <motion.div
+                          key={stack.name}
+                          whileHover={{
+                            y: -4,
+                            borderColor: '#00ff66',
+                            boxShadow: "0px 0px 15px rgba(0,255,65,0.3)"
+                          }}
+                          onClick={() => {
+                            clickSound();
+                            setSelectedTech(stack);
+                          }}
+                          className="bg-black/80 border border-matrix/30 p-3 sm:p-4 rounded relative overflow-hidden group cursor-pointer flex flex-col justify-between"
+                        >
+                          <div className="absolute top-0 right-0 p-1 text-[8px] bg-matrix-dark/30 border-l border-b border-matrix/20 text-matrix/50 group-hover:text-matrix-light font-bold">
+                            {stack.category}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 sm:gap-3 mb-2 pt-1">
+                              {getTechIcon(stack.name)}
+                              <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-matrix-light transition-colors leading-normal truncate">
+                                {stack.name}
+                              </h4>
+                            </div>
+                          </div>
+                          {/* Gauge bar */}
+                          <div className="mt-2 space-y-1">
+                            <div className="flex justify-between text-[9px] text-matrix/60 font-mono">
+                              <span>MASTERY</span>
+                              <span className="text-matrix-light font-bold">{stack.level}%</span>
+                            </div>
+                            <div className="w-full bg-matrix-dark/30 h-1.5 rounded overflow-hidden border border-matrix/10">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${stack.level}%` }}
+                                transition={{ duration: 0.8, delay: idx * 0.05 }}
+                                className="bg-matrix h-full shadow-glow"
+                              />
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Pagination dots & helper note */}
+                <div className="flex items-center justify-between pt-2 border-t border-matrix/20 text-[10px] text-matrix-dark font-mono">
+                  <div className="flex items-center gap-1.5">
+                    {Array.from({ length: totalTechPages }).map((_, idx) => (
+                      <button
+                        key={idx}
                         onClick={() => {
                           clickSound();
-                          setSelectedTech(stack);
+                          setTechCarouselIndex(idx);
                         }}
-                        className="bg-black/80 border border-matrix/30 p-3 sm:p-4 rounded relative overflow-hidden group cursor-pointer"
-                      >
-                        <div className="absolute top-0 right-0 p-1 text-[8px] bg-matrix-dark/30 border-l border-b border-matrix/20 text-matrix/50 group-hover:text-matrix-light font-bold">
-                          {stack.category}
-                        </div>
-                        <div className="flex items-center gap-3 mb-2">
-                          {getTechIcon(stack.name)}
-                          <h4 className="text-sm font-bold text-white group-hover:text-matrix-light transition-colors leading-normal">
-                            {stack.name}
-                          </h4>
-                        </div>
-                        {/* Gauge bar */}
-                        <div className="w-full bg-matrix-dark/30 h-1.5 rounded overflow-hidden border border-matrix/10">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${stack.level}%` }}
-                            transition={{ duration: 1, delay: idx * 0.05 }}
-                            className="bg-matrix h-full shadow-glow"
-                          />
-                        </div>
-                      </motion.div>
+                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                          techCarouselIndex === idx
+                            ? 'w-6 bg-matrix shadow-glow'
+                            : 'w-2 bg-matrix-dark/40 hover:bg-matrix/40'
+                        }`}
+                        title={`Page ${idx + 1}`}
+                      />
                     ))}
-                  </AnimatePresence>
+                  </div>
+                  <div className="text-[10px] text-matrix/60 flex items-center gap-1">
+                    <span className="hidden sm:inline">CLICK CARD TO INSPECT //</span>
+                    <span>SHOWING {filteredSkills.length === 0 ? 0 : techCarouselIndex * itemsPerPage + 1}-{Math.min((techCarouselIndex + 1) * itemsPerPage, filteredSkills.length)} OF {filteredSkills.length}</span>
+                  </div>
                 </div>
               </section>
 
@@ -895,172 +873,289 @@ export default function App() {
                 </div>
               </section>
 
-              {/* GAMING INTELLIGENCE DECK */}
-              <div className="cyber-card p-4 sm:p-6 space-y-6 shadow-glow">
-                <div className="flex items-center justify-between border-b border-matrix/30 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-matrix-light font-bold text-sm tracking-widest uppercase text-glow">GAMING_INTELLIGENCE</span>
+              {/* DUO SECTION: GAMING INTELLIGENCE + SYSTEM SPECS */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* GAMING INTELLIGENCE DECK */}
+                <div className="lg:col-span-2 cyber-card p-4 sm:p-6 space-y-5 shadow-glow">
+                  <div className="flex items-center justify-between border-b border-matrix/30 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-matrix-light font-bold text-sm tracking-widest uppercase text-glow">GAMING_INTELLIGENCE</span>
+                    </div>
+                    <span className="text-[9px] text-matrix-dark uppercase font-bold tracking-widest animate-pulse">CLASSIFIED_OPS</span>
                   </div>
-                  <span className="text-[9px] text-matrix-dark uppercase font-bold tracking-widest animate-pulse">CLASSIFIED_OPS</span>
-                </div>
 
-                {/* Sub tabs */}
-                <div className="flex gap-2">
-                  {(['mlbb', 'codm', 'genshin'] as const).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        clickSound();
-                        setGamingTab(tab);
-                        setSelectedHeroInfo('');
-                      }}
-                      className={`flex-grow py-1.5 text-[10px] border rounded transition-all font-bold ${
-                        gamingTab === tab
-                          ? 'border-matrix bg-matrix/20 text-matrix-light text-glow'
-                          : 'border-matrix/20 text-matrix/50 hover:border-matrix/40 hover:text-matrix'
-                      }`}
-                    >
-                      {tab.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
+                  {/* Sub tabs */}
+                  <div className="flex gap-2">
+                    {(['mlbb', 'codm', 'genshin'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => {
+                          clickSound();
+                          setGamingTab(tab);
+                          setSelectedHeroInfo('');
+                        }}
+                        className={`flex-grow py-1.5 text-[10px] border rounded transition-all font-bold cursor-pointer ${
+                          gamingTab === tab
+                            ? 'border-matrix bg-matrix/20 text-matrix-light text-glow'
+                            : 'border-matrix/20 text-matrix/50 hover:border-matrix/40 hover:text-matrix'
+                        }`}
+                      >
+                        {tab.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
 
-                {/* Tab content specs */}
-                <div className="bg-black/40 border border-matrix-dark/20 p-4 rounded min-h-[140px] flex flex-col justify-between font-mono">
-                  {gamingTab === 'mlbb' && (
-                    <div className="space-y-2 text-xs">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-matrix-dark/10 pb-1 gap-1">
-                        <span className="text-matrix/70 text-[10px] sm:text-xs">RANK:</span>
-                        <span className="text-white font-bold flex flex-wrap items-center gap-1 sm:text-right">
-                          {MLBB_DATA.rank}
-                        </span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start border-b border-matrix-dark/10 pb-1 gap-1">
-                        <span className="text-matrix/70 text-[10px] sm:text-xs">SIGNATURE:</span>
-                        <button
-                          onClick={() => {
-                            clickSound();
-                            setSelectedHeroInfo(selectedHeroInfo === 'kagura' ? '' : 'kagura');
-                          }}
-                          className="text-matrix-light font-bold hover:underline cursor-pointer flex items-center gap-1 focus:outline-none text-left sm:text-right"
-                        >
-                          {MLBB_DATA.signature}
-                        </button>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                        <span className="text-matrix/70 text-[10px] sm:text-xs">ROLE:</span>
-                        <span className="text-white sm:text-right">{MLBB_DATA.role}</span>
-                      </div>
+                  {/* Tab content specs */}
+                  <div className="bg-black/40 border border-matrix-dark/20 p-4 rounded min-h-[140px] flex flex-col justify-between font-mono">
+                    {gamingTab === 'mlbb' && (
+                      <div className="space-y-2 text-xs">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-matrix-dark/10 pb-1 gap-1">
+                          <span className="text-matrix/70 text-[10px] sm:text-xs">RANK:</span>
+                          <span className="text-white font-bold flex flex-wrap items-center gap-1 sm:text-right">
+                            {MLBB_DATA.rank}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start border-b border-matrix-dark/10 pb-1 gap-1">
+                          <span className="text-matrix/70 text-[10px] sm:text-xs">SIGNATURE:</span>
+                          <button
+                            onClick={() => {
+                              clickSound();
+                              setSelectedHeroInfo(selectedHeroInfo === 'kagura' ? '' : 'kagura');
+                            }}
+                            className="text-matrix-light font-bold hover:underline cursor-pointer flex items-center gap-1 focus:outline-none text-left sm:text-right"
+                          >
+                            {MLBB_DATA.signature}
+                          </button>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                          <span className="text-matrix/70 text-[10px] sm:text-xs">ROLE:</span>
+                          <span className="text-white sm:text-right">{MLBB_DATA.role}</span>
+                        </div>
 
-                      {selectedHeroInfo === 'kagura' && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="bg-matrix-dark/20 border border-matrix/30 p-2 rounded text-[10px] mt-2 text-matrix-light/90 leading-relaxed border-l-2 border-l-matrix"
-                        >
-                          <span className="font-bold text-white uppercase block mb-1">{MLBB_DATA.intelTitle}</span>
-                          {MLBB_DATA.intelDesc}
-                        </motion.div>
-                      )}
-                    </div>
-                  )}
+                        {selectedHeroInfo === 'kagura' && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-matrix-dark/20 border border-matrix/30 p-2 rounded text-[10px] mt-2 text-matrix-light/90 leading-relaxed border-l-2 border-l-matrix"
+                          >
+                            <span className="font-bold text-white uppercase block mb-1">{MLBB_DATA.intelTitle}</span>
+                            {MLBB_DATA.intelDesc}
+                          </motion.div>
+                        )}
+                      </div>
+                    )}
 
-                  {gamingTab === 'codm' && (
-                    <div className="space-y-2 text-xs">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-matrix-dark/10 pb-1 gap-1">
-                        <span className="text-matrix/70 text-[10px] sm:text-xs">MP RANK:</span>
-                        <span className="text-white font-bold flex flex-wrap items-center gap-1 sm:text-right">
-                          {CODM_DATA.mpRank}
-                        </span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                        <span className="text-matrix/70 text-[10px] sm:text-xs">BR RANK:</span>
-                        <span className="text-white font-bold flex flex-wrap items-center gap-1 sm:text-right">
-                          {CODM_DATA.brRank}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {gamingTab === 'genshin' && (
-                    <div className="space-y-2 text-xs">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-matrix-dark/10 pb-1 gap-1">
-                        <span className="text-matrix/70 text-[10px] sm:text-xs">ADVENTURE LEVEL:</span>
-                        <span className="text-white font-bold sm:text-right">{GENSHIN_DATA.arLevel}</span>
-                      </div>
-                      <div className="pb-1">
-                        <span className="text-matrix/70 block mb-1">ACTIVE MAIN TEAM:</span>
-                        <div className="flex gap-1.5 flex-wrap">
-                          {GENSHIN_DATA.team.map((hero) => (
-                            <button
-                              key={hero.name}
-                              onClick={() => {
-                                clickSound();
-                                setSelectedHeroInfo(selectedHeroInfo === hero.name.toLowerCase() ? '' : hero.name.toLowerCase());
-                              }}
-                              className={`px-1.5 py-0.5 border rounded text-[10px] font-bold cursor-pointer transition-all ${hero.color} hover:brightness-125 focus:outline-none`}
-                            >
-                              {hero.name}
-                            </button>
-                          ))}
+                    {gamingTab === 'codm' && (
+                      <div className="space-y-2 text-xs">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-matrix-dark/10 pb-1 gap-1">
+                          <span className="text-matrix/70 text-[10px] sm:text-xs">MP RANK:</span>
+                          <span className="text-white font-bold flex flex-wrap items-center gap-1 sm:text-right">
+                            {CODM_DATA.mpRank}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                          <span className="text-matrix/70 text-[10px] sm:text-xs">BR RANK:</span>
+                          <span className="text-white font-bold flex flex-wrap items-center gap-1 sm:text-right">
+                            {CODM_DATA.brRank}
+                          </span>
                         </div>
                       </div>
+                    )}
 
-                      {GENSHIN_DATA.team.map((hero) => {
-                        if (selectedHeroInfo !== hero.name.toLowerCase()) return null;
-                        return (
-                          <motion.div
-                            key={hero.name}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className={`p-2 border rounded text-[10px] mt-1 border-l-2 ${hero.color.split(' ').slice(0, 3).join(' ')}`}
-                          >
-                            <span className="font-bold block mb-0.5">{hero.intelTitle}</span>
-                            {hero.intelDesc}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  )}
+                    {gamingTab === 'genshin' && (
+                      <div className="space-y-2 text-xs">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-matrix-dark/10 pb-1 gap-1">
+                          <span className="text-matrix/70 text-[10px] sm:text-xs">ADVENTURE LEVEL:</span>
+                          <span className="text-white font-bold sm:text-right">{GENSHIN_DATA.arLevel}</span>
+                        </div>
+                        <div className="pb-1">
+                          <span className="text-matrix/70 block mb-1">ACTIVE MAIN TEAM:</span>
+                          <div className="flex gap-1.5 flex-wrap">
+                            {GENSHIN_DATA.team.map((hero) => (
+                              <button
+                                key={hero.name}
+                                onClick={() => {
+                                  clickSound();
+                                  setSelectedHeroInfo(selectedHeroInfo === hero.name.toLowerCase() ? '' : hero.name.toLowerCase());
+                                }}
+                                className={`px-1.5 py-0.5 border rounded text-[10px] font-bold cursor-pointer transition-all ${hero.color} hover:brightness-125 focus:outline-none`}
+                              >
+                                {hero.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {GENSHIN_DATA.team.map((hero) => {
+                          if (selectedHeroInfo !== hero.name.toLowerCase()) return null;
+                          return (
+                            <motion.div
+                              key={hero.name}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className={`p-2 border rounded text-[10px] mt-1 border-l-2 ${hero.color.split(' ').slice(0, 3).join(' ')}`}
+                            >
+                              <span className="font-bold block mb-0.5">{hero.intelTitle}</span>
+                              {hero.intelDesc}
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* SYSTEM SPECS // REVEAL LOCKS */}
+                <div className="lg:col-span-1 cyber-card p-4 sm:p-6 space-y-4 shadow-glow font-mono flex flex-col justify-between">
+                  <div>
+                    <div className="text-xs text-matrix-dark border-b border-matrix/20 pb-2 uppercase font-bold tracking-wider">
+                      SYSTEM_SPECS // REVEAL_LOCKS
+                    </div>
+                    <div className="space-y-3 pt-2">
+                      <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
+                        <span className="text-matrix/70 text-xs">FAV_COLOR:</span>
+                        <button
+                          onClick={() => { clickSound(); setRevealColor(!revealColor); }}
+                          className="focus:outline-none"
+                        >
+                          {revealColor ? (
+                            <span className="text-blue-400 font-bold text-xs">{SYSTEM_SPECS_DATA.favColorRevealed}</span>
+                          ) : (
+                            <GlitchText text={BIO_OVERVIEW.favColorPlaceholder} className="text-red-500 bg-red-950/20 px-1 border border-red-500/30 text-xs cursor-pointer" />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="text-sm flex justify-between items-center border-b border-matrix-dark/10 py-1">
+                        <span className="text-matrix/70 text-xs">BIRTHDAY:</span>
+                        <button
+                          onClick={() => { clickSound(); setRevealBirthday(!revealBirthday); }}
+                          className="focus:outline-none"
+                        >
+                          {revealBirthday ? (
+                            <span className="text-white font-bold text-xs">{SYSTEM_SPECS_DATA.birthdayRevealed}</span>
+                          ) : (
+                            <GlitchText text={BIO_OVERVIEW.birthdayPlaceholder} className="text-matrix-light bg-matrix-dark/30 px-1 border border-matrix/30 text-xs cursor-pointer" />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="text-xs flex justify-between py-1">
+                        <span className="text-matrix/70">GEOLOCATION:</span>
+                        <span className="text-white font-bold">{SYSTEM_SPECS_DATA.geolocation}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-matrix-dark/20 text-[9px] text-matrix-dark flex justify-between">
+                    <span>SECURITY: CLEARANCE_LVL_2</span>
+                    <span className="text-matrix-light/60">NODE: ONLINE</span>
+                  </div>
+                </div>
+
               </div>
 
-            </div>
+              {/* SYSTEM INTERACTIVE CLI DRAW CONSOLE */}
+              <section className="cyber-card shadow-glow overflow-hidden">
+                <button
+                  onClick={() => {
+                    clickSound();
+                    setCliOpen(!cliOpen);
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-matrix-dark/10 hover:bg-matrix-dark/20 text-xs font-bold font-mono tracking-widest text-matrix-light border-b border-matrix/20 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <TerminalSquare size={16} className={cliOpen ? "animate-pulse" : ""} />
+                    <span>INTERACTIVE_SYSTEM_SHELL</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 border border-matrix/30 rounded bg-black">
+                    {cliOpen ? "COLLAPSE_TERM" : "OPEN_TERM"}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {cliOpen && (
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: "auto" }}
+                      exit={{ height: 0 }}
+                      className="bg-black/95 p-4 space-y-4"
+                    >
+                      <div className="h-44 overflow-y-auto font-mono text-xs text-matrix/90 space-y-1 bg-[#020202] p-3 border border-matrix-dark/40 rounded scrollbar-thin">
+                        {cliHistory.map((line, idx) => (
+                          <p key={idx} className="whitespace-pre-wrap">{line}</p>
+                        ))}
+                        <div className="flex items-center text-matrix-light mt-1">
+                          <span className="mr-2 text-matrix-dark font-bold">&gt;</span>
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              executeCommand(cliInput);
+                            }}
+                            className="flex-grow flex items-center"
+                          >
+                            <input
+                              type="text"
+                              value={cliInput}
+                              onChange={(e) => setCliInput(e.target.value)}
+                              className="bg-transparent border-none outline-none text-matrix-light flex-grow font-mono focus:ring-0 focus:border-none p-0 text-xs"
+                              placeholder="Type 'help' and press Enter..."
+                              autoFocus
+                            />
+                          </form>
+                        </div>
+                      </div>
+                      <div className="text-[9px] text-matrix-dark flex justify-between font-mono">
+                        <span>SECURITY_CLEARANCE: OPERATOR</span>
+                        <span>SHELL_VERSION: v2.0.4</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </section>
+
           </main>
 
-          {/* Socials & footer networks */}
-          <footer className="space-y-8 pt-8 border-t border-matrix/20 text-center font-mono">
-            <div className="flex items-center justify-center gap-2 text-xs text-matrix-dark uppercase tracking-widest font-bold">
-              <Share2 size={14} /> SECURITY_CLEARANCE // CONNECT_CHANNELS
+          {/* COMPACT SPACE-SAVING CYBER FOOTER DOCK */}
+          <footer className="border-t border-matrix/20 pt-4 pb-2 font-mono space-y-3">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-matrix/70 text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-matrix animate-ping" />
+                <span className="text-matrix-light font-bold">OPERATOR_CHANNELS</span>
+                <span className="text-matrix-dark hidden md:inline">// CONNECT_PIPELINE</span>
+              </div>
+
+              {/* Compact social pills */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5">
+                {[
+                  { name: 'Gmail', icon: <Mail size={12} />, url: 'mailto:patrickjoshanedez35@gmail.com' },
+                  { name: 'Facebook', icon: <Facebook size={12} />, url: 'https://www.facebook.com/Patkik.juice/' },
+                  { name: 'Instagram', icon: <Instagram size={12} />, url: 'https://www.instagram.com/patweck009/' },
+                  { name: 'TikTok', icon: <span className="font-black text-[9px] leading-none">TT</span>, url: 'https://tiktok.com/@takeshi_190' },
+                  { name: 'GitHub', icon: <Github size={12} />, url: 'https://github.com/Patkik' },
+                  { name: 'LinkedIn', icon: <Linkedin size={12} />, url: 'https://linkedin.com' },
+                ].map((social, index) => (
+                  <a
+                    key={index}
+                    href={social.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => clickSound()}
+                    className="flex items-center gap-1.5 border border-matrix/30 hover:border-matrix hover:bg-matrix/15 px-2.5 py-1 rounded text-[11px] text-matrix-light bg-black/70 transition-all font-mono"
+                    title={social.name}
+                  >
+                    {social.icon}
+                    <span className="text-white hover:text-matrix-light text-[10px]">{social.name}</span>
+                  </a>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4">
-              {[
-                { name: 'Gmail', icon: <Mail size={16} />, url: 'mailto:patrickjoshanedez35@gmail.com' },
-                { name: 'Facebook', icon: <Facebook size={16} />, url: 'https://www.facebook.com/Patkik.juice/' },
-                { name: 'Instagram', icon: <Instagram size={16} />, url: 'https://www.instagram.com/patweck009/' },
-                { name: 'TikTok', icon: <span className="font-black text-[10px] tracking-tighter">TT</span>, url: 'https://tiktok.com/@takeshi_190' },
-                { name: 'GitHub', icon: <Github size={16} />, url: 'https://github.com/Patkik' },
-                { name: 'LinkedIn', icon: <Linkedin size={16} />, url: 'https://linkedin.com' },
-              ].map((social, index) => (
-                <a
-                  key={index}
-                  href={social.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => clickSound()}
-                  className="flex items-center gap-2 border border-matrix/30 hover:border-matrix-light hover:bg-matrix/10 px-4 py-2 rounded text-xs text-matrix bg-black transition-all group font-mono shadow-glow"
-                >
-                  {social.icon}
-                  <span className="text-white group-hover:text-matrix-light transition-colors">{social.name}</span>
-                  <ExternalLink size={10} className="opacity-40 group-hover:opacity-100 transition-opacity" />
-                </a>
-              ))}
+            <div className="text-center sm:text-left text-[9px] text-matrix-dark flex flex-col sm:flex-row items-center justify-between gap-1 pt-2 border-t border-matrix-dark/10">
+              <span>© {new Date().getFullYear()} PATRICK JOSH AÑEDEZ // ALL RIGHTS RESERVED</span>
+              <span className="text-matrix/40">SYSTEM STATUS: OPTIMAL (v2.4)</span>
             </div>
-
-            <p className="text-[10px] text-matrix-dark font-mono uppercase tracking-widest pt-4">
-              © {new Date().getFullYear()} - PATRICK JOSH AÑEDEZ. ALL SYSTEM PARAMETERS GRANTED BY THE PREHISTORIC APEX DINOSAUR.
-            </p>
           </footer>
         </motion.div>
       )}
